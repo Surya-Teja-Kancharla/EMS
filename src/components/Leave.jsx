@@ -1,6 +1,6 @@
 // File: src/components/Leave.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Plus, 
   CheckCircle,
