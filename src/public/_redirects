@@ -1,0 +1,5 @@
+# Netlify Redirect Rule for Single-Page Applications
+# This rule ensures that all paths are redirected to the root index.html file,
+# allowing React Router to handle the routing on the client side.
+
+/* /index.html   200
