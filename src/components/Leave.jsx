@@ -1,20 +1,18 @@
+// File: src/components/Leave.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   Plus, 
   CheckCircle,
   XCircle,
   Eye
 } from 'lucide-react';
-import api from '../api';
+import api from '../../api';
 
 const Leave = () => {
   const { user } = useAuth();
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterType, setFilterType] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({
     type: 'annual',
@@ -33,9 +31,11 @@ const Leave = () => {
     setLoading(true);
     try {
       let url = '/leaves';
-      // Employees see only their own leave requests
       if (user.role === 'employee') {
         url = '/leaves/my-leaves';
+      } else if (user.role === 'department_head') {
+        // A potential future enhancement: fetch leaves only for the manager's department
+        // For now, we fetch all and let them manage.
       }
       const response = await api.get(url);
       setLeaves(response.data);
@@ -49,30 +49,28 @@ const Leave = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.startDate || !formData.endDate || !formData.reason) {
-        alert("Please fill all required fields.");
+        // A more user-friendly notification would be better than alert()
+        console.error("Please fill all required fields.");
         return;
     }
     try {
       await api.post('/leaves', formData);
-      fetchLeaves(); // Refresh the list after adding
+      fetchLeaves();
       resetForm();
     } catch (error) {
       console.error('Error creating leave:', error);
-      alert('Failed to create leave request.');
     }
   };
 
   const handleStatusUpdate = async (leaveId, status) => {
     try {
-      // For a real app, you might want a modal to add comments for rejection
       await api.put(`/leaves/${leaveId}/status`, { 
           status, 
           approvalComments: status === 'rejected' ? 'Rejected by manager.' : 'Approved' 
       });
-      fetchLeaves(); // Refresh the list after updating
+      fetchLeaves();
     } catch (error) {
       console.error('Error updating leave status:', error);
-      alert('Failed to update leave status.');
     }
   };
 
@@ -81,24 +79,11 @@ const Leave = () => {
     setShowAddModal(false);
   };
 
-  const filteredLeaves = leaves.filter(leave => {
-    const employeeName = `${leave.employee.firstName} ${leave.employee.lastName}`;
-    const matchesSearch = user.role !== 'employee' ? 
-      (employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      leave.employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase())) : true;
-    
-    const matchesStatus = filterStatus === 'all' || leave.status === filterStatus;
-    const matchesType = filterType === 'all' || leave.type === filterType;
-    
-    return matchesSearch && matchesStatus && matchesType;
-  });
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved': return 'bg-green-100 text-green-800';
       case 'rejected': return 'bg-red-100 text-red-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -108,24 +93,16 @@ const Leave = () => {
       case 'annual': return 'bg-blue-100 text-blue-800';
       case 'sick': return 'bg-red-100 text-red-800';
       case 'personal': return 'bg-purple-100 text-purple-800';
-      case 'emergency': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
   
-  const getHeaderContent = () => {
-    switch(user?.role) {
-      case 'admin':
-        return { title: 'Leave Overview', description: 'Review and manage all employee leave requests.' };
-      case 'hr':
-      case 'department_head':
-        return { title: 'Leave Management', description: 'Manage employee leave requests and approvals.' };
-      default:
-        return { title: 'My Leave', description: 'Apply for leave and track your requests.' };
-    }
-  };
-
-  const { title, description } = getHeaderContent();
+  const { title, description } = {
+      admin: { title: 'Leave Overview', description: 'Review and manage all employee leave requests.' },
+      hr: { title: 'Leave Management', description: 'Manage employee leave requests and approvals.' },
+      department_head: { title: 'Team Leave Requests', description: 'Approve or deny leave for your team members.' },
+      employee: { title: 'My Leave', description: 'Apply for leave and track your requests.' }
+  }[user?.role] || { title: 'Leave', description: '' };
 
   if (loading) {
     return (
@@ -137,13 +114,12 @@ const Leave = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
           <p className="text-gray-500 mt-1">{description}</p>
         </div>
-        {user?.role !== 'admin' && (
+        {user?.role === 'employee' && (
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
@@ -154,7 +130,6 @@ const Leave = () => {
         )}
       </div>
 
-      {/* Leave Table */}
        <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -168,12 +143,13 @@ const Leave = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredLeaves.map((leave) => (
+            {leaves.map((leave) => (
               <tr key={leave._id}>
                 {user?.role !== 'employee' && (
                     <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{leave.employee.firstName} {leave.employee.lastName}</div>
-                        <div className="text-sm text-gray-500">{leave.employee.employeeId}</div>
+                        {/* FIX: Use optional chaining for safety */}
+                        <div className="text-sm font-medium text-gray-900">{leave.employee?.firstName} {leave.employee?.lastName}</div>
+                        <div className="text-sm text-gray-500">{leave.employee?.employeeId}</div>
                     </td>
                 )}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -205,7 +181,6 @@ const Leave = () => {
         </table>
       </div>
 
-      {/* Add Leave Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-xl">
@@ -223,9 +198,6 @@ const Leave = () => {
                   <option value="annual">Annual Leave</option>
                   <option value="sick">Sick Leave</option>
                   <option value="personal">Personal Leave</option>
-                  <option value="emergency">Emergency Leave</option>
-                  <option value="maternity">Maternity Leave</option>
-                  <option value="paternity">Paternity Leave</option>
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
