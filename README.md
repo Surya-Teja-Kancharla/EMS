@@ -135,7 +135,7 @@ EMS/
 │   │   │   └── Performance.tsx      # Performance tracking
 │   │   │   └── Leave.tsx            # Leave management
 │   │   │   └── Payroll.tsx          # Payroll management
-│   │       └── Layout.tsx           # Main layout wrapper
+│   │   │   └── Layout.tsx           # Main layout wrapper
 │   ├── contexts/
 │   │   └── AuthContext.tsx          # Authentication context
 │   ├── App.tsx                      # Main app component
