@@ -1,5 +1,8 @@
+// File: backend/models/User.js
+// WARNING: This version stores passwords in plain text and is NOT secure.
+// For educational/debugging purposes only.
+
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -10,8 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    minlength: 8
+    required: true
   },
   role: {
     type: String,
@@ -33,22 +35,11 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+// REMOVED: The pre-save hook that hashes the password is gone.
 
-// Method to compare passwords
-userSchema.methods.comparePassword = async function(password) {
-  return await bcrypt.compare(password, this.password);
+// UPDATED: This method now does a simple, insecure string comparison.
+userSchema.methods.comparePassword = function(candidatePassword) {
+  return this.password === candidatePassword;
 };
 
 export default mongoose.model('User', userSchema);
