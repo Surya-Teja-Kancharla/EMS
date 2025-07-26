@@ -140,7 +140,8 @@ EMS/
 │   │   └── AuthContext.tsx          # Authentication context
 │   ├── App.tsx                      # Main app component
 │   └── main.tsx                     # App entry point
-│   └── index.html                   
+│   ├── dist/
+│       └── index.html                   
 ├── package.json
 └── README.md
 ```
