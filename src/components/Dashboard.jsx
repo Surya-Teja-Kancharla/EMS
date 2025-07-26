@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   Building2, 
@@ -14,19 +14,13 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-interface DashboardStats {
-  totalEmployees: number;
-  activeEmployees: number;
-  inactiveEmployees: number;
-  departmentStats: Array<{ name: string; count: number }>;
-}
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => { 
   const { user } = useAuth();
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
 
-  // Using mock data since login is bypassed and API call might fail
-  const [stats, setStats] = useState<DashboardStats | null>({
+  // Using mock data. Type annotations removed from useState.
+  const [stats, setStats] = useState({
     totalEmployees: 50,
     activeEmployees: 45,
     inactiveEmployees: 5,
@@ -37,9 +31,8 @@ const Dashboard: React.FC = () => {
         { name: 'HR', count: 5 },
     ]
   });
-  const [loading, setLoading] = useState(false); // Set to false to show content
+  const [loading, setLoading] = useState(false);
 
-  // The original API call logic is kept here for when you connect the backend
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -49,12 +42,11 @@ const Dashboard: React.FC = () => {
         // setStats(response.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        // Fallback to mock data on error
       } finally {
         setLoading(false);
       }
     };
-    // fetchDashboardData(); // Commented out to prevent errors
+    // fetchDashboardData(); // Kept commented to prevent errors during dev
   }, []);
 
   const getGreeting = () => {
@@ -65,7 +57,7 @@ const Dashboard: React.FC = () => {
   };
 
   const getRoleBasedContent = () => {
-    switch (user?.role || 'admin') { // Default to 'admin' for preview
+    switch (user?.role || 'admin') {
       case 'admin':
         return {
           title: 'System Overview',
@@ -122,11 +114,14 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards */}
       {(user?.role === 'admin' || user?.role === 'hr') && stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Stat cards content... */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border"><div className="flex items-center"><div className="p-2 bg-blue-100 rounded-lg"><Users className="h-6 w-6 text-blue-600" /></div><div className="ml-4"><p className="text-sm font-medium text-gray-600">Total Employees</p><p className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</p></div></div></div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border"><div className="flex items-center"><div className="p-2 bg-green-100 rounded-lg"><TrendingUp className="h-6 w-6 text-green-600" /></div><div className="ml-4"><p className="text-sm font-medium text-gray-600">Active Employees</p><p className="text-2xl font-bold text-gray-900">{stats.activeEmployees}</p></div></div></div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border"><div className="flex items-center"><div className="p-2 bg-orange-100 rounded-lg"><Building2 className="h-6 w-6 text-orange-600" /></div><div className="ml-4"><p className="text-sm font-medium text-gray-600">Departments</p><p className="text-2xl font-bold text-gray-900">{stats.departmentStats.length}</p></div></div></div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border"><div className="flex items-center"><div className="p-2 bg-purple-100 rounded-lg"><Calendar className="h-6 w-6 text-purple-600" /></div><div className="ml-4"><p className="text-sm font-medium text-gray-600">This Month</p><p className="text-2xl font-bold text-gray-900">{new Date().toLocaleDateString('en-US', { month: 'short' })}</p></div></div></div>
         </div>
       )}
 
-      {/* Quick Actions - Now full width */}
+      {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -148,7 +143,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Recent Activity - Now below Quick Actions */}
+      {/* Recent Activity */}
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
         <div className="space-y-4">
@@ -157,7 +152,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Department Distribution - Only for Admin and HR */}
+      {/* Department Distribution */}
       {(user?.role === 'admin' || user?.role === 'hr') && stats && (
         <div className="bg-white rounded-xl p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Department Distribution</h3>
@@ -169,7 +164,7 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Employee Info - For Employees */}
+      {/* Employee Info */}
       {user?.role === 'employee' && (
         <div className="bg-white rounded-xl p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">My Information</h3>

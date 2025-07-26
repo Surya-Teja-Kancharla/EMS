@@ -13,7 +13,8 @@ import Payroll from './components/Payroll';
 import Layout from './components/Layout';
 import './index.css';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Type annotations removed from ProtectedRoute
+const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
@@ -24,12 +25,13 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
   
-  //return user ? <>{children}</> : <Navigate to="/login" />;
+  // This is the version that bypasses login for development.
+  // Remember to switch back to: return user ? <>{children}</> : <Navigate to="/login" />;
   return <>{children}</>; 
 };
 
-// AppRoutes defines which pages get the main layout with the sidebar.
-const AppRoutes: React.FC = () => {
+// Type annotation removed from AppRoutes
+const AppRoutes = () => {
   const { user } = useAuth();
 
   return (
@@ -39,7 +41,6 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
 
       {/* Routes inside the main layout. Each page is wrapped by Layout. */}
-      {/* Routes with layout */}
       <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
       <Route path="/employees" element={<ProtectedRoute><Layout><Employees /></Layout></ProtectedRoute>} />
@@ -48,13 +49,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/leave" element={<ProtectedRoute><Layout><Leave /></Layout></ProtectedRoute>} />
       <Route path="/payroll" element={<ProtectedRoute><Layout><Payroll /></Layout></ProtectedRoute>} />
       <Route path="/jobs" element={<ProtectedRoute><Layout><Jobs /></Layout></ProtectedRoute>} />
-      
-      {/* Add other protected routes here in the same way */}
     </Routes>
   );
 };
 
-// The main App component now simply provides the Auth context and the Router.
+// The main App component remains the same.
 function App() {
   return (
     <AuthProvider>

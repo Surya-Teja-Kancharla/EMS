@@ -14,11 +14,9 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
+// The TypeScript interface has been removed.
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout = ({ children }) => { // Removed : React.FC<LayoutProps> and type for children
   const { user, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -51,9 +49,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      {/* On large screens (lg), it becomes a static part of the layout. */}
-      {/* On smaller screens, it's a fixed overlay. */}
-      {/* 'flex-shrink-0' is added to prevent the sidebar from shrinking. */}
       <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out flex-shrink-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
         lg:translate-x-0 lg:static`}>
@@ -124,9 +119,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* Main content area */}
-      {/* 'flex-1' makes this div grow to fill all available space. */}
-      {/* 'flex-col' arranges the header and main content vertically. */}
-      {/* The problematic 'lg:ml-64' has been removed. */}
       <div className="flex-1 flex flex-col">
         {/* Top header */}
         <header className="bg-white shadow-sm border-b border-gray-200">
@@ -137,7 +129,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <Menu className="h-6 w-6" />
             </button>
-            {/* This empty div will push the welcome message to the right on mobile */}
             <div className="flex-1"></div>
             <span className="text-sm text-gray-500">
               Welcome back, {user?.employee?.firstName}!
@@ -146,7 +137,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </header>
 
         {/* Page content */}
-        {/* 'overflow-y-auto' allows this area to scroll if content is too long. */}
         <main className="flex-1 p-6 overflow-y-auto">
           {children}
         </main>
