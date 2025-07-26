@@ -6,47 +6,10 @@ import {
   Search, 
   Filter, 
   Star,
-  TrendingUp,
-  Users,
-  Calendar,
   Eye,
   Edit
 } from 'lucide-react';
-import axios from 'axios';
-
-// Mock data for demonstration
-const mockPerformances = [
-  {
-    _id: '1',
-    employee: { _id: 'e1', firstName: 'Aarav', lastName: 'Sharma', employeeId: 'TS-001' },
-    reviewer: { _id: 'r1', firstName: 'Admin', lastName: 'User' },
-    period: { startDate: '2025-01-01', endDate: '2025-06-30' },
-    ratings: { technical: 5, communication: 4, teamwork: 5, leadership: 4, innovation: 4 },
-    overallRating: 4.4,
-    status: 'approved',
-    createdAt: '2025-07-10'
-  },
-  {
-    _id: '2',
-    employee: { _id: 'e2', firstName: 'Priya', lastName: 'Patel', employeeId: 'TS-002' },
-    reviewer: { _id: 'r1', firstName: 'Admin', lastName: 'User' },
-    period: { startDate: '2025-01-01', endDate: '2025-06-30' },
-    ratings: { technical: 4, communication: 5, teamwork: 4, leadership: 5, innovation: 5 },
-    overallRating: 4.6,
-    status: 'submitted',
-    createdAt: '2025-07-15'
-  },
-  {
-    _id: '3',
-    employee: { _id: 'e5', firstName: 'Vikram', lastName: 'Singh', employeeId: 'TS-005' },
-    reviewer: { _id: 'r1', firstName: 'Admin', lastName: 'User' },
-    period: { startDate: '2025-01-01', endDate: '2025-06-30' },
-    ratings: { technical: 3, communication: 4, teamwork: 3, leadership: 2, innovation: 3 },
-    overallRating: 3.0,
-    status: 'draft',
-    createdAt: '2025-07-20'
-  }
-];
+import api from '../api';
 
 const Performance = () => {
   const { user } = useAuth();
@@ -56,21 +19,21 @@ const Performance = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    fetchPerformances();
-  }, []);
+    if (user) {
+      fetchPerformances();
+    }
+  }, [user]);
 
   const fetchPerformances = async () => {
     setLoading(true);
     try {
-      // Using mock data for demonstration
-      setPerformances(mockPerformances);
-      // In a real app, you would fetch data like this:
-      // let url = 'http://localhost:5000/api/performance';
-      // if (user?.role === 'employee') {
-      //   url = `http://localhost:5000/api/performance/employee/${user.employee?._id}`;
-      // }
-      // const response = await axios.get(url);
-      // setPerformances(response.data);
+      let url = '/performance';
+      // If the user is an employee, fetch only their own performance reviews
+      if (user.role === 'employee') {
+        url = `/performance/employee/${user.employee._id}`;
+      }
+      const response = await api.get(url);
+      setPerformances(response.data);
     } catch (error) {
       console.error('Error fetching performances:', error);
     } finally {

@@ -1,9 +1,14 @@
+// File: backend/index.js
+// =================================================================================
+// Server Entry Point for Employee Management System (Corrected)
+// =================================================================================
+
 import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/db.js';
 
-// Import routes
+// Import Routes
 import authRoutes from './routes/authRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
@@ -11,24 +16,39 @@ import roleRoutes from './routes/roleRoutes.js';
 import performanceRoutes from './routes/performanceRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
 import salaryRoutes from './routes/salaryRoutes.js';
+import jobPostingRoutes from './routes/jobPostingRoutes.js';
+import jobApplicationRoutes from './routes/jobApplicationRoutes.js';
 
+// Load environment variables
 dotenv.config();
 
+// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
+// Connect to MongoDB Database
 connectDB();
 
-// Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// --- Middleware Setup ---
 
-// Routes
+// CORS Configuration
+// This allows the frontend (running on Netlify or localhost) to make requests to this backend.
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // Vite's default dev port
+    'http://localhost:3000', // Common React dev port
+    process.env.FRONTEND_URL    // Your production frontend URL from .env
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+// Body Parser Middleware
+// This allows the server to accept and parse JSON in request bodies.
+app.use(express.json());
+
+// --- API Routes ---
+// All API endpoints are prefixed with /api
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/departments', departmentRoutes);
@@ -36,32 +56,18 @@ app.use('/api/roles', roleRoutes);
 app.use('/api/performance', performanceRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/salary', salaryRoutes);
+app.use('/api/jobs', jobPostingRoutes);
+app.use('/api/applications', jobApplicationRoutes);
 
-// Health check route
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    message: 'Tech Solutions EMS Backend is running successfully!', 
-    timestamp: new Date(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+
+// --- Root Endpoint ---
+// A simple health check endpoint to confirm the server is running.
+app.get('/', (req, res) => {
+  res.send('Employee Management System API is running...');
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
-  });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'API endpoint not found' });
-});
-
+// --- Start Server ---
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
-});s
+  console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+});

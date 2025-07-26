@@ -10,44 +10,39 @@ import {
   Award,
   DollarSign,
   FileText,
-  Briefcase
+  Briefcase,
+  Settings,
+  UserCheck
 } from 'lucide-react';
-import axios from 'axios';
-
+import api from '../api';
 
 const Dashboard = () => { 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Using mock data. Type annotations removed from useState.
-  const [stats, setStats] = useState({
-    totalEmployees: 50,
-    activeEmployees: 45,
-    inactiveEmployees: 5,
-    departmentStats: [
-        { name: 'Engineering', count: 15 },
-        { name: 'Sales', count: 10 },
-        { name: 'Marketing', count: 8 },
-        { name: 'HR', count: 5 },
-    ]
-  });
-  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!user) return;
+      
       setLoading(true);
       try {
-        // This will be replaced by your actual API call
-        // const response = await axios.get('http://localhost:5000/api/employees/stats');
-        // setStats(response.data);
+        // Fetch stats only if the user is an admin or HR
+        if (user.role === 'admin' || user.role === 'hr') {
+          const statsRes = await api.get('/employees/stats');
+          setStats(statsRes.data);
+        }
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
       }
     };
-    // fetchDashboardData(); // Kept commented to prevent errors during dev
-  }, []);
+
+    fetchDashboardData();
+  }, [user]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -57,31 +52,60 @@ const Dashboard = () => {
   };
 
   const getRoleBasedContent = () => {
-    switch (user?.role || 'admin') {
+    switch (user?.role) {
       case 'admin':
-        return {
-          title: 'System Overview',
-          description: 'Complete control over the Employee Management System'
-        };
+        return { title: 'System Overview', description: 'Complete control over the Employee Management System' };
       case 'hr':
-        return {
-          title: 'HR Dashboard',
-          description: 'Manage employees, payroll, and organizational data'
-        };
+        return { title: 'HR Dashboard', description: 'Manage employees, payroll, and organizational data' };
       case 'department_head':
-        return {
-          title: 'Department Management',
-          description: 'Oversee your team performance and assignments'
-        };
+        return { title: 'Department Management', description: 'Oversee your team performance and assignments' };
       default:
-        return {
-          title: 'Employee Portal',
-          description: 'Access your personal information and company resources'
-        };
+        return { title: 'Employee Portal', description: 'Access your personal information and company resources' };
     }
   };
 
   const roleContent = getRoleBasedContent();
+
+  const renderQuickActions = () => {
+    switch (user?.role) {
+      case 'admin':
+        return (
+          <>
+            <button onClick={() => navigate('/employees')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><Users className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Manage Users</span></button>
+            <button onClick={() => navigate('/departments')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Building2 className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Departments</span></button>
+            <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><Calendar className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">View Leaves</span></button>
+            <button className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><Settings className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">System Settings</span></button>
+          </>
+        );
+      case 'hr':
+        return (
+          <>
+            <button onClick={() => navigate('/employees')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><Users className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Add Employee</span></button>
+            <button onClick={() => navigate('/payroll')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><DollarSign className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">Process Payroll</span></button>
+            <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Calendar className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Manage Leaves</span></button>
+            <button className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><FileText className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Reports</span></button>
+          </>
+        );
+      case 'department_head':
+       return (
+        <>
+          <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><UserCheck className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Approve Leaves</span></button>
+          <button onClick={() => navigate('/performance')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Award className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Team Performance</span></button>
+          <button onClick={() => navigate('/employees')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><Users className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">View Team</span></button>
+          <button className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><FileText className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Team Reports</span></button>
+        </>
+      );
+      default: // Employee
+        return (
+          <>
+            <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><Clock className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Apply Leave</span></button>
+            <button onClick={() => navigate('/performance')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Award className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Performance</span></button>
+            <button onClick={() => navigate('/payroll')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><DollarSign className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">View Payslips</span></button>
+            <button onClick={() => navigate('/jobs')} className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><Briefcase className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Browse Jobs</span></button>
+          </>
+        );
+    }
+  };
 
   if (loading) {
     return (
@@ -98,7 +122,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
-              {getGreeting()}, {user?.employee?.firstName || 'Admin'}!
+              {getGreeting()}, {user?.employee?.firstName || 'User'}!
             </h1>
             <p className="text-xl mb-1">{roleContent.title}</p>
             <p className="text-blue-100">{roleContent.description}</p>

@@ -1,5 +1,6 @@
+// File: src/components/Auth/Login.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn, Mail, Lock, Building2 } from 'lucide-react';
 
@@ -11,6 +12,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,9 +20,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // In a real app, the login function would make an API call.
-      // For now, we can simulate a login to see the dashboard.
       await login(formData.email, formData.password);
+      navigate('/dashboard'); // Redirect to dashboard on successful login
     } catch (err) {
       setError(err.message || 'Failed to sign in. Please check your credentials.');
     } finally {
@@ -48,7 +49,7 @@ const Login = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
               {error}
             </div>
           )}
@@ -66,6 +67,7 @@ const Login = () => {
                   id="email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   required
                   value={formData.email}
                   onChange={handleChange}
@@ -87,6 +89,7 @@ const Login = () => {
                   id="password"
                   name="password"
                   type="password"
+                  autoComplete="current-password"
                   required
                   value={formData.password}
                   onChange={handleChange}
@@ -125,10 +128,10 @@ const Login = () => {
 
         <div className="mt-8 p-4 bg-white rounded-lg shadow-sm border">
           <h3 className="text-sm font-medium text-gray-900 mb-2">Demo Credentials:</h3>
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-gray-600 space-y-2">
             <p><strong>Admin:</strong> admin@techsolutions.com / admin123</p>
-            <p><strong>HR:</strong> hr@techsolutions.com / hr123</p>
-            <p><strong>Employee:</strong> employee@techsolutions.com / emp123</p>
+            <p><strong>Manager:</strong> raj.verma@techsolutions.com / head123</p>
+            <p><strong>Employee:</strong> kiran.rao@techsolutions.com / emp123</p>
           </div>
         </div>
       </div>

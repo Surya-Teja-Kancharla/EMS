@@ -12,13 +12,12 @@ import {
   X,
   Home
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
 
-// The TypeScript interface has been removed.
-
-const Layout = ({ children }) => { // Removed : React.FC<LayoutProps> and type for children
+const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize the navigate function
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigationItems = [
@@ -35,7 +34,14 @@ const Layout = ({ children }) => { // Removed : React.FC<LayoutProps> and type f
     item.roles.includes(user?.role || 'employee')
   );
 
-  const handleLogout = () => logout();
+  const handleLogout = async () => {
+    try {
+        await logout();
+        navigate('/login'); // Redirect to login page after logout
+    } catch (error) {
+        console.error("Failed to log out:", error);
+    }
+  };
 
   return (
     // The main container uses flexbox to lay out the sidebar and content.

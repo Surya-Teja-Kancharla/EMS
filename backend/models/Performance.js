@@ -52,6 +52,7 @@ const performanceSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Auto-calculate overall rating before saving
 performanceSchema.pre('save', function(next) {
   const ratings = Object.values(this.ratings).filter(r => r != null);
   if (ratings.length > 0) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   DollarSign, 
@@ -7,105 +7,58 @@ import {
   Filter, 
   Download,
   Eye,
-  Edit,
-  CheckCircle,
-  Clock
+  CheckCircle
 } from 'lucide-react';
-import axios from 'axios';
-
-// Mock data for demonstration
-const mockSalaries = [
-  {
-    _id: '1',
-    employee: { _id: 'e1', firstName: 'Aarav', lastName: 'Sharma', employeeId: 'TS-001' },
-    basicSalary: 60000,
-    allowances: { hra: 12000, transport: 2000, meal: 1500, medical: 1000, other: 500 },
-    deductions: { pf: 4000, tax: 2500, insurance: 1000, other: 500 },
-    month: 7,
-    year: 2025,
-    workingDays: 22,
-    attendedDays: 22,
-    overtime: { hours: 0, rate: 0 },
-    bonus: 2000,
-    netSalary: 68000,
-    status: 'paid',
-    processedDate: '2025-07-25',
-    createdAt: '2025-07-01'
-  },
-  {
-    _id: '2',
-    employee: { _id: 'e2', firstName: 'Priya', lastName: 'Patel', employeeId: 'TS-002' },
-    basicSalary: 80000,
-    allowances: { hra: 15000, transport: 2500, meal: 2000, medical: 1500, other: 0 },
-    deductions: { pf: 5000, tax: 4500, insurance: 1500, other: 500 },
-    month: 7,
-    year: 2025,
-    workingDays: 22,
-    attendedDays: 21,
-    overtime: { hours: 5, rate: 300 },
-    bonus: 0,
-    netSalary: 89500,
-    status: 'processed',
-    processedDate: '2025-07-26',
-    createdAt: '2025-07-01'
-  },
-  {
-    _id: '3',
-    employee: { _id: 'e3', firstName: 'Rohan', lastName: 'Kumar', employeeId: 'TS-003' },
-    basicSalary: 50000,
-    allowances: { hra: 10000, transport: 1500, meal: 1000, medical: 1000, other: 0 },
-    deductions: { pf: 3000, tax: 2000, insurance: 800, other: 200 },
-    month: 7,
-    year: 2025,
-    workingDays: 22,
-    attendedDays: 22,
-    overtime: { hours: 0, rate: 0 },
-    bonus: 1500,
-    netSalary: 56000,
-    status: 'draft',
-    createdAt: '2025-07-01'
-  }
-];
+import api from '../api';
 
 const Payroll = () => {
   const { user } = useAuth();
-  const [salaries, setSalaries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterMonth, setFilterMonth] = useState('');
-  const [filterYear, setFilterYear] = useState('');
+  const [salaries, setSalaries] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [filterStatus, setFilterStatus] = React.useState('all');
+  const [filterMonth, setFilterMonth] = React.useState('');
+  const [filterYear, setFilterYear] = React.useState('');
 
-  useEffect(() => {
-    fetchSalaries();
-  }, [filterMonth, filterYear]);
+  React.useEffect(() => {
+    if (user) {
+      fetchSalaries();
+    }
+  }, [user, filterMonth, filterYear]);
 
   const fetchSalaries = async () => {
     setLoading(true);
+    setError(null);
     try {
-      // Using mock data for demonstration
-      setSalaries(mockSalaries);
-      // In a real app, you would use axios like this:
-      // let url = 'http://localhost:5000/api/salary';
-      // ... (rest of the API call logic)
-      // const response = await axios.get(url);
-      // setSalaries(response.data);
-    } catch (error) {
-      console.error('Error fetching salaries:', error);
+      let url = '/salary';
+      const params = new URLSearchParams();
+
+      if (user.role === 'employee') {
+        url = '/salary/my-salary';
+      } else {
+        if (filterMonth) params.append('month', filterMonth);
+        if (filterYear) params.append('year', filterYear);
+      }
+      
+      const response = await api.get(url, { params });
+      setSalaries(response.data);
+    } catch (err) {
+      setError('Failed to fetch payroll data.');
+      console.error('Error fetching salaries:', err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleProcessSalary = async (salaryId) => {
-    console.log(`Processing salary with ID: ${salaryId}`);
-    // try {
-    //   await axios.put(`http://localhost:5000/api/salary/${salaryId}/process`);
-    //   fetchSalaries();
-    // } catch (error) {
-    //   console.error('Error processing salary:', error);
-    //   alert(error.response?.data?.message || 'Error processing salary');
-    // }
+    try {
+      await api.put(`/salary/${salaryId}/process`);
+      fetchSalaries(); // Re-fetch to update the status
+    } catch (error) {
+      console.error('Error processing salary:', error);
+      alert('Failed to process salary.');
+    }
   };
 
   const filteredSalaries = salaries.filter(salary => {
@@ -126,14 +79,6 @@ const Payroll = () => {
       case 'draft': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
-  };
-
-  const getTotalAllowances = (allowances) => {
-    return Object.values(allowances).reduce((sum, val) => sum + val, 0);
-  };
-
-  const getTotalDeductions = (deductions) => {
-    return Object.values(deductions).reduce((sum, val) => sum + val, 0);
   };
 
   const months = [
@@ -232,6 +177,9 @@ const Payroll = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                             <button className="p-2 rounded-full hover:bg-gray-100"><Eye className="h-5 w-5 text-gray-500"/></button>
                             <button className="p-2 rounded-full hover:bg-gray-100"><Download className="h-5 w-5 text-gray-500"/></button>
+                            {(user?.role === 'admin' || user?.role === 'hr') && salary.status === 'draft' && (
+                                <button onClick={() => handleProcessSalary(salary._id)} className="p-2 rounded-full hover:bg-blue-100"><CheckCircle className="h-5 w-5 text-blue-500"/></button>
+                            )}
                         </td>
                     </tr>
                 ))}

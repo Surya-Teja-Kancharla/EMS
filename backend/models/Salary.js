@@ -64,6 +64,7 @@ const salarySchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Auto-calculate net salary before saving
 salarySchema.pre('save', function(next) {
   const totalAllowances = Object.values(this.allowances).reduce((sum, val) => sum + val, 0);
   const totalDeductions = Object.values(this.deductions).reduce((sum, val) => sum + val, 0);

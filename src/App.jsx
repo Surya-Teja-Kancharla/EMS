@@ -1,6 +1,9 @@
+// File: src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+
+// Import Components and Pages
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
@@ -13,34 +16,39 @@ import Payroll from './components/Payroll';
 import Layout from './components/Layout';
 import './index.css';
 
-// Type annotations removed from ProtectedRoute
+/**
+ * A wrapper for routes that require authentication.
+ * It checks if a user is logged in. If not, it redirects to the /login page.
+ * It also shows a loading spinner while authentication status is being checked.
+ */
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
       </div>
     );
   }
   
-  // This is the version that bypasses login for development.
-  // Remember to switch back to: return user ? <>{children}</> : <Navigate to="/login" />;
-  return <>{children}</>; 
+  // If loading is finished and there is no user, redirect to login.
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-// Type annotation removed from AppRoutes
+/**
+ * Defines all the application routes.
+ */
 const AppRoutes = () => {
   const { user } = useAuth();
 
   return (
     <Routes>
-      {/* Routes outside the main layout (no sidebar) */}
+      {/* Public routes (no sidebar) - accessible only when not logged in */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
 
-      {/* Routes inside the main layout. Each page is wrapped by Layout. */}
+      {/* Protected routes (with sidebar) - wrapped in Layout and ProtectedRoute */}
       <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
       <Route path="/employees" element={<ProtectedRoute><Layout><Employees /></Layout></ProtectedRoute>} />
@@ -49,11 +57,16 @@ const AppRoutes = () => {
       <Route path="/leave" element={<ProtectedRoute><Layout><Leave /></Layout></ProtectedRoute>} />
       <Route path="/payroll" element={<ProtectedRoute><Layout><Payroll /></Layout></ProtectedRoute>} />
       <Route path="/jobs" element={<ProtectedRoute><Layout><Jobs /></Layout></ProtectedRoute>} />
+
+      {/* Fallback route for any other path */}
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
     </Routes>
   );
 };
 
-// The main App component remains the same.
+/**
+ * The main App component that sets up the AuthProvider and Router.
+ */
 function App() {
   return (
     <AuthProvider>

@@ -1,59 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
-  Calendar, 
   Plus, 
-  Search, 
-  Filter, 
-  Clock,
   CheckCircle,
   XCircle,
   Eye
 } from 'lucide-react';
-import axios from 'axios';
-
-// Mock data to use since we are not connected to a backend
-const mockLeaves = [
-    {
-        _id: '1',
-        employee: { _id: 'e1', firstName: 'Priya', lastName: 'Patel', employeeId: 'TS-002' },
-        type: 'annual',
-        startDate: '2025-08-01',
-        endDate: '2025-08-05',
-        days: 5,
-        reason: 'Family vacation.',
-        status: 'approved',
-        approver: { _id: 'a1', firstName: 'Admin', lastName: 'User' },
-        approvalDate: '2025-07-20',
-        createdAt: '2025-07-18'
-    },
-    {
-        _id: '2',
-        employee: { _id: 'e3', firstName: 'Rohan', lastName: 'Kumar', employeeId: 'TS-003' },
-        type: 'sick',
-        startDate: '2025-07-28',
-        endDate: '2025-07-28',
-        days: 1,
-        reason: 'Feeling unwell.',
-        status: 'pending',
-        createdAt: '2025-07-25'
-    },
-    {
-        _id: '3',
-        employee: { _id: 'e4', firstName: 'Sneha', lastName: 'Reddy', employeeId: 'TS-004' },
-        type: 'personal',
-        startDate: '2025-09-10',
-        endDate: '2025-09-12',
-        days: 3,
-        reason: 'Personal appointment.',
-        status: 'rejected',
-        approver: { _id: 'a1', firstName: 'Admin', lastName: 'User' },
-        approvalDate: '2025-07-22',
-        approvalComments: 'Please provide more details.',
-        createdAt: '2025-07-21'
-    }
-];
-
+import api from '../api';
 
 const Leave = () => {
   const { user } = useAuth();
@@ -71,21 +24,21 @@ const Leave = () => {
   });
 
   useEffect(() => {
-    fetchLeaves();
-  }, []);
+    if (user) {
+      fetchLeaves();
+    }
+  }, [user]);
 
   const fetchLeaves = async () => {
     setLoading(true);
     try {
-      // Using mock data for demonstration.
-      // In a real app, you would uncomment the axios calls.
-      setLeaves(mockLeaves);
-      // let url = 'http://localhost:5000/api/leaves';
-      // if (user?.role === 'employee') {
-      //   url = 'http://localhost:5000/api/leaves/my-leaves';
-      // }
-      // const response = await axios.get(url);
-      // setLeaves(response.data);
+      let url = '/leaves';
+      // Employees see only their own leave requests
+      if (user.role === 'employee') {
+        url = '/leaves/my-leaves';
+      }
+      const response = await api.get(url);
+      setLeaves(response.data);
     } catch (error) {
       console.error('Error fetching leaves:', error);
     } finally {
@@ -95,48 +48,44 @@ const Leave = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting new leave request:', formData);
-    // In a real app, you would make the API call here.
-    // try {
-    //   await axios.post('http://localhost:5000/api/leaves', formData);
-    //   fetchLeaves();
-    //   resetForm();
-    // } catch (error) {
-    //   console.error('Error creating leave:', error);
-    //   alert(error.response?.data?.message || 'Error creating leave request');
-    // }
-    resetForm(); // For demonstration
+    if (!formData.startDate || !formData.endDate || !formData.reason) {
+        alert("Please fill all required fields.");
+        return;
+    }
+    try {
+      await api.post('/leaves', formData);
+      fetchLeaves(); // Refresh the list after adding
+      resetForm();
+    } catch (error) {
+      console.error('Error creating leave:', error);
+      alert('Failed to create leave request.');
+    }
   };
 
-  const handleStatusUpdate = async (leaveId, status, comments = '') => {
-    console.log(`Updating leave ${leaveId} to ${status}`);
-    // try {
-    //   await axios.put(`http://localhost:5000/api/leaves/${leaveId}/status`, {
-    //     status,
-    //     approvalComments: comments
-    //   });
-    //   fetchLeaves();
-    // } catch (error) {
-    //   console.error('Error updating leave status:', error);
-    //   alert(error.response?.data?.message || 'Error updating leave status');
-    // }
+  const handleStatusUpdate = async (leaveId, status) => {
+    try {
+      // For a real app, you might want a modal to add comments for rejection
+      await api.put(`/leaves/${leaveId}/status`, { 
+          status, 
+          approvalComments: status === 'rejected' ? 'Rejected by manager.' : 'Approved' 
+      });
+      fetchLeaves(); // Refresh the list after updating
+    } catch (error) {
+      console.error('Error updating leave status:', error);
+      alert('Failed to update leave status.');
+    }
   };
 
   const resetForm = () => {
-    setFormData({
-      type: 'annual',
-      startDate: '',
-      endDate: '',
-      reason: ''
-    });
+    setFormData({ type: 'annual', startDate: '', endDate: '', reason: '' });
     setShowAddModal(false);
   };
 
   const filteredLeaves = leaves.filter(leave => {
     const employeeName = `${leave.employee.firstName} ${leave.employee.lastName}`;
-    const matchesSearch = 
-      employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      leave.employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = user.role !== 'employee' ? 
+      (employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      leave.employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase())) : true;
     
     const matchesStatus = filterStatus === 'all' || leave.status === filterStatus;
     const matchesType = filterType === 'all' || leave.type === filterType;
@@ -163,6 +112,20 @@ const Leave = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+  
+  const getHeaderContent = () => {
+    switch(user?.role) {
+      case 'admin':
+        return { title: 'Leave Overview', description: 'Review and manage all employee leave requests.' };
+      case 'hr':
+      case 'department_head':
+        return { title: 'Leave Management', description: 'Manage employee leave requests and approvals.' };
+      default:
+        return { title: 'My Leave', description: 'Apply for leave and track your requests.' };
+    }
+  };
+
+  const { title, description } = getHeaderContent();
 
   if (loading) {
     return (
@@ -177,45 +140,42 @@ const Leave = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Leave Management</h1>
-          <p className="text-gray-500 mt-1">
-            {user?.role === 'employee' 
-              ? 'Apply for leave and track your requests'
-              : 'Manage employee leave requests and approvals'
-            }
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+          <p className="text-gray-500 mt-1">{description}</p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Apply for Leave
-        </button>
+        {user?.role !== 'admin' && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Apply for Leave
+          </button>
+        )}
       </div>
-
-      {/* Stats Cards and Filters can be added here as needed */}
 
       {/* Leave Table */}
        <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+              {user?.role !== 'employee' && <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>}
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredLeaves.map((leave) => (
               <tr key={leave._id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{leave.employee.firstName} {leave.employee.lastName}</div>
-                    <div className="text-sm text-gray-500">{leave.employee.employeeId}</div>
-                </td>
+                {user?.role !== 'employee' && (
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{leave.employee.firstName} {leave.employee.lastName}</div>
+                        <div className="text-sm text-gray-500">{leave.employee.employeeId}</div>
+                    </td>
+                )}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
                 </td>
@@ -230,15 +190,20 @@ const Leave = () => {
                         {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
                     </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900">Details</button>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                    <button className="p-2 rounded-full hover:bg-gray-100"><Eye className="h-5 w-5 text-gray-500"/></button>
+                    {(user?.role === 'admin' || user?.role === 'hr' || user?.role === 'department_head') && leave.status === 'pending' && (
+                        <>
+                            <button onClick={() => handleStatusUpdate(leave._id, 'approved')} className="p-2 rounded-full hover:bg-green-100"><CheckCircle className="h-5 w-5 text-green-500"/></button>
+                            <button onClick={() => handleStatusUpdate(leave._id, 'rejected')} className="p-2 rounded-full hover:bg-red-100"><XCircle className="h-5 w-5 text-red-500"/></button>
+                        </>
+                    )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
 
       {/* Add Leave Modal */}
       {showAddModal && (
@@ -250,6 +215,7 @@ const Leave = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Leave Type *</label>
                 <select
                   required
+                  name="type"
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -267,6 +233,7 @@ const Leave = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
                   <input
                     type="date"
+                    name="startDate"
                     required
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
@@ -277,6 +244,7 @@ const Leave = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
                   <input
                     type="date"
+                    name="endDate"
                     required
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
@@ -288,6 +256,7 @@ const Leave = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Reason *</label>
                 <textarea
                   required
+                  name="reason"
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                   rows={3}
