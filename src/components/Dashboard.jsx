@@ -66,7 +66,40 @@ const Dashboard = () => {
 
   const roleContent = getRoleBasedContent();
 
-  if (loading && !stats) { // Only show full-page loader on initial load
+  const renderQuickActions = () => {
+    switch (user?.role) {
+      case 'admin':
+      case 'hr':
+        return (
+          <>
+            <button onClick={() => navigate('/employees')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><Users className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Manage Employees</span></button>
+            <button onClick={() => navigate('/departments')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Building2 className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Departments</span></button>
+            <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><Calendar className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">Manage Leaves</span></button>
+            <button onClick={() => navigate('/payroll')} className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><DollarSign className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Process Payroll</span></button>
+          </>
+        );
+      case 'department_head':
+       return (
+        <>
+          <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><UserCheck className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Approve Leaves</span></button>
+          <button onClick={() => navigate('/performance')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Award className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Team Performance</span></button>
+          <button onClick={() => navigate('/employees')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><Users className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">View Team</span></button>
+          <button onClick={() => navigate('/jobs')} className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><Briefcase className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Open Jobs</span></button>
+        </>
+      );
+      default: // Employee
+        return (
+          <>
+            <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><Clock className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Apply Leave</span></button>
+            <button onClick={() => navigate('/performance')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Award className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">My Performance</span></button>
+            <button onClick={() => navigate('/payroll')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><DollarSign className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">View Payslips</span></button>
+            <button onClick={() => navigate('/jobs')} className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><Briefcase className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Browse Jobs</span></button>
+          </>
+        );
+    }
+  };
+
+  if (loading && !stats) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -108,44 +141,31 @@ const Dashboard = () => {
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button onClick={() => navigate('/employees')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><Users className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Manage Employees</span></button>
-            <button onClick={() => navigate('/departments')} className="flex flex-col items-center justify-center p-4 text-center bg-green-50 hover:bg-green-100 rounded-lg transition-colors"><Building2 className="h-8 w-8 text-green-600 mb-2" /><span className="text-sm font-medium text-gray-900">Departments</span></button>
-            <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"><Calendar className="h-8 w-8 text-purple-600 mb-2" /><span className="text-sm font-medium text-gray-900">Manage Leaves</span></button>
-            <button onClick={() => navigate('/payroll')} className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><DollarSign className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Process Payroll</span></button>
+          {renderQuickActions()}
         </div>
       </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"><div className="h-2 w-2 bg-blue-600 rounded-full"></div><div className="flex-1"><p className="text-sm font-medium text-gray-900">System updated successfully</p><p className="text-xs text-gray-500">2 hours ago</p></div></div>
-          <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"><div className="h-2 w-2 bg-green-600 rounded-full"></div><div className="flex-1"><p className="text-sm font-medium text-gray-900">Welcome to Tech Solutions EMS</p><p className="text-xs text-gray-500">Today</p></div></div>
-        </div>
-      </div>
-
-      {/* Department Distribution */}
-      {(user?.role === 'admin' || user?.role === 'hr') && stats && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Department Distribution</h3>
-          <div className="space-y-3">
-            {stats.departmentStats.map((dept, index) => (
-              <div key={index} className="flex items-center justify-between"><span className="text-sm font-medium text-gray-700">{dept.name}</span><div className="flex items-center space-x-2"><div className="w-20 bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: `${(dept.count / stats.totalEmployees) * 100}%` }}></div></div><span className="text-sm text-gray-900 font-medium">{dept.count}</span></div></div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* My Information Section */}
       {user?.employee && (
         <div className="bg-white rounded-xl p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">My Information</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between"><span className="text-sm text-gray-600">Employee ID:</span><span className="text-sm font-medium text-gray-900">{user.employee?.employeeId}</span></div>
-            {/* FIX: Use optional chaining at each level to prevent crashes */}
-            <div className="flex justify-between"><span className="text-sm text-gray-600">Department:</span><span className="text-sm font-medium text-gray-900">{user.employee?.department?.name || 'N/A'}</span></div>
-            <div className="flex justify-between"><span className="text-sm text-gray-600">Role:</span><span className="text-sm font-medium text-gray-900">{user.employee?.role?.title || 'N/A'}</span></div>
-            <div className="flex justify-between"><span className="text-sm text-gray-600">Status:</span><span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">{user.employee?.status || 'N/A'}</span></div>
+          {/* FIX: Changed grid to auto-size the first column for a tighter layout */}
+          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 items-center">
+            <div className="text-sm font-medium text-gray-600">Employee ID:</div>
+            <div className="text-sm text-gray-900">{user.employee?.employeeId || 'N/A'}</div>
+            
+            <div className="text-sm font-medium text-gray-600">Department:</div>
+            <div className="text-sm text-gray-900">{user.employee?.department?.name || 'N/A'}</div>
+
+            <div className="text-sm font-medium text-gray-600">Role:</div>
+            <div className="text-sm text-gray-900">{user.employee?.role?.title || 'N/A'}</div>
+
+            <div className="text-sm font-medium text-gray-600">Status:</div>
+            <div>
+                <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                    {user.employee?.status || 'N/A'}
+                </span>
+            </div>
           </div>
         </div>
       )}
