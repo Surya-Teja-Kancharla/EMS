@@ -7,7 +7,7 @@ import {
   XCircle,
   Eye
 } from 'lucide-react';
-import api from '../../api';
+import api from '../api';
 
 const Leave = () => {
   const { user } = useAuth();
