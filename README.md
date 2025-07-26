@@ -127,22 +127,14 @@ EMS/
 │   └── package.json
 ├── src/
 │   ├── components/
-│   │   ├── Auth/
 │   │   │   ├── Login.tsx            # Login component
 │   │   │   └── Register.tsx         # Registration component
-│   │   ├── Dashboard/
 │   │   │   └── Dashboard.tsx        # Role-based dashboard
-│   │   ├── Employees/
 │   │   │   └── Employees.tsx        # Employee management
-│   │   ├── Departments/
 │   │   │   └── Departments.tsx      # Department management
-│   │   ├── Performance/
 │   │   │   └── Performance.tsx      # Performance tracking
-│   │   ├── Leave/
 │   │   │   └── Leave.tsx            # Leave management
-│   │   ├── Payroll/
 │   │   │   └── Payroll.tsx          # Payroll management
-│   │   └── Layout/
 │   │       └── Layout.tsx           # Main layout wrapper
 │   ├── contexts/
 │   │   └── AuthContext.tsx          # Authentication context
