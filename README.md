@@ -130,11 +130,19 @@ The project is organized into two main folders: `frontend` and `backend`.
     npm install
     cp .env.example .env
     ```
-    -   Open the newly created `backend/.env` file and add your MongoDB connection string and a JWT secret:
+    -   Open the newly created `backend/.env` file and add your configuration. It must follow this format:
         ```env
-        MONGODB_URI=your_mongodb_connection_string
-        JWT_SECRET=your_super_secret_key
+        # The port your backend server will run on (e.g., 5000)
         PORT=5000
+
+        # Your MongoDB connection string (local or from Atlas)
+        MONGODB_URI=mongodb://localhost:27017/EMS
+
+        # A long, random, and secret string for signing JWT tokens
+        JWT_SECRET=your_super_secret_jwt_key_here
+
+        # The URL of your frontend application (for CORS in production)
+        # FRONTEND_URL=[https://techsolutionsemsapp.netlify.app](https://techsolutionsemsapp.netlify.app)
         ```
 
 3.  **Seed the Database**
@@ -145,9 +153,8 @@ The project is organized into two main folders: `frontend` and `backend`.
     ```bash
     cd ../frontend
     npm install
-    cp .env.local.example .env.local
     ```
-    -   The `frontend/.env.local` file should point to your local backend server. The default is usually correct:
+    - The frontend reads its API URL from `.env.local`. Create this file in the `frontend` directory if it doesn't exist:
         ```env
         VITE_API_URL=http://localhost:5000/api
         ```
