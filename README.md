@@ -1,220 +1,176 @@
-# Tech Solutions - Employee Management System
+# Tech Solutions - Employee Management System (EMS)
 
-A comprehensive Employee Management System built with the MERN stack for "Tech Solutions", a growing startup based in Mumbai, India.
+A comprehensive, full-stack Employee Management System built with the MERN stack (MongoDB, Express.js, React, Node.js) for "Tech Solutions," a growing startup.
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/a1b2c3d4-e5f6-7890-abcd-ef1234567890/deploy-status)](https://app.netlify.com/sites/techsolutionsemsapp/deploys)
+
+---
+
+## 🌐 Live Demo & Credentials
+
+You can access the live, deployed version of the application here:
+
+**🔗 Live App URL: [https://techsolutionsemsapp.netlify.app/login](https://techsolutionsemsapp.netlify.app/login)**
+
+Feel free to test the application using the following demo credentials for different roles:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| 👤 **Admin** | `admin@techsolutions.com` | `admin123` |
+| 💼 **HR** | `hr@techsolutions.com` | `hr123` |
+| 👨‍💼 **Manager** | `raj.verma@techsolutions.com` | `manager123` |
+| 👷 **Employee** | `kiran.rao@techsolutions.com` | `emp123` |
+
+---
 
 ## 🏢 About the Project
 
-Tech Solutions is a software development company that creates custom solutions across domains like education, finance, technology, and design. As the organization scales, this EMS provides a centralized system to manage employees' records, performance, payroll, and internal communication.
+Tech Solutions is a software development company that creates custom solutions across various domains. As the organization scales, this EMS provides a centralized system to manage employee records, performance, payroll, and internal communication, tailored to different roles within the company.
 
-## 🚀 Features
+---
+
+## 🚀 Core Features
 
 ### Authentication & Authorization
+- **JWT-based Authentication**: Secure login system using JSON Web Tokens.
+- **Role-based Access Control**: The UI and API are tailored to four distinct roles:
+  - **System Admin**: Full system access, including user and department management.
+  - **HR Manager**: Manages employee data, performance, payroll, and manager leave requests.
+  - **Manager**: Oversees their specific department's team, manages performance reviews, and approves employee leave.
+  - **Employee**: Access to personal data, leave requests, and payslip viewing.
 
-- **JWT-based Authentication** with bcrypt password hashing
-- **Role-based Access Control**:
-  - **System Admin**: Full system access and user management
-  - **HR Manager**: Employee data, performance metrics, payroll management
-  - **Department Heads**: Team management, task assignments, performance updates
-  - **Employees**: Personal data access, leave requests, payslip viewing
+### Key Modules
+- **Employee Management**: Full CRUD operations for employee records.
+- **Department Management**: Admins can create, update, and delete company departments.
+- **Performance Tracking**: Managers can create and update performance reviews for their team.
+- **Payroll Management**: Admins/HR can create and process payroll records, and employees can view their payslips.
+- **Leave Management**: A hierarchical leave approval system (Employee -> Manager -> HR -> Admin).
+- **Job Board**: Admins/HR can post job openings for internal viewing.
+- **Role-Specific Dashboards**: Each role gets a tailored dashboard with relevant stats and quick actions.
 
-### Core Modules
-
-#### 1. Employee Information Management
-
-- Personal details (Name, Contact, Address)
-- Job information (Department, Role, Manager, Status)
-- Salary information with detailed breakdown
-- Employee search and filtering
-
-#### 2. Performance Tracking
-
-- Project task management
-- Multi-criteria rating system (Technical, Communication, Teamwork, Leadership, Innovation)
-- Performance reviews by department heads
-- Historical performance tracking
-
-#### 3. Payroll Management
-
-- Automated salary calculations
-- Allowances and deductions management
-- Bonus and overtime tracking
-- Payslip generation and history
-- Payroll processing workflow
-
-#### 4. Leave Management
-
-- Multiple leave types (Annual, Sick, Personal, Emergency, Maternity, Paternity)
-- Leave application workflow
-- Manager approval system
-- Leave balance tracking
-
-#### 5. Department Management
-
-- Department structure and hierarchy
-- Budget allocation
-- Head assignment
-- Employee distribution analytics
-
-#### 6. Dashboard & Analytics
-
-- Role-specific dashboards
-- Real-time statistics
-- Performance metrics
-- Quick action panels
+---
 
 ## 🛠️ Technology Stack
 
-### Frontend
+| Area | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | **React 18** | Core UI library for building components. |
+| | **Vite** | Next-generation frontend tooling for fast development. |
+| | **Tailwind CSS** | A utility-first CSS framework for rapid styling. |
+| | **React Router** | For client-side routing and navigation. |
+| | **Axios** | For making HTTP requests to the backend API. |
+| | **Lucide React** | Beautiful and consistent icons. |
+| **Backend** | **Node.js** | JavaScript runtime for the server. |
+| | **Express.js** | Web application framework for building the API. |
+| | **MongoDB** | NoSQL database for storing application data. |
+| | **Mongoose** | Object Data Modeling (ODM) library for MongoDB. |
+| | **JWT** | For secure user authentication. |
 
-- **React 18** with TypeScript
-- **Tailwind CSS** for styling
-- **React Router DOM** for navigation
-- **Axios** for API communication
-- **Lucide React** for icons
-- **React Hook Form** for form handling
+---
 
-### Backend
+## 📁 File Structure Explained
 
-- **Node.js** with Express.js
-- **MongoDB** with Mongoose ODM
-- **JWT** for authentication
-- **bcryptjs** for password hashing
-- **CORS** for cross-origin requests
+The project is organized into two main folders: `frontend` and `backend`.
 
-### Development Tools
+### `backend/`
+-   `node_modules/`: Stores all backend dependencies.
+-   `.env`: Contains environment variables like the database connection string and JWT secret. **(This file is not committed to Git)**.
+-   `index.js`: The main entry point for the Express server. It sets up middleware, connects to the database, and defines the API routes.
+-   `package.json`: Lists all backend dependencies and scripts.
+-   **`config/`**
+    -   `db.js`: Contains the logic to connect to the MongoDB database using Mongoose.
+-   **`controllers/`**: Holds the business logic for the application. Each file corresponds to a specific data model.
+    -   `authController.js`: Handles user registration, login, and profile fetching.
+    -   `employeeController.js`: Manages all CRUD operations for employees.
+-   **`middleware/`**
+    -   `auth.js`: Contains JWT verification and role-based authorization functions to protect API routes.
+-   **`models/`**: Defines the Mongoose schemas for each collection in the database.
+    -   `User.js`: Schema for user login credentials and roles.
+    -   `Employee.js`: Schema for detailed employee information.
+-   **`routes/`**: Defines the API endpoints. Each file maps HTTP routes (e.g., `/api/employees`) to the corresponding controller functions.
 
-- **Vite** for fast development and building
-- **ESLint** for code linting
-- **TypeScript** for type safety
+### `frontend/`
+-   `dist/`: Contains the optimized production build files, generated by `npm run build`.
+-   `node_modules/`: Stores all frontend dependencies.
+-   `public/`: Contains static assets.
+    -   `_redirects`: Netlify configuration for handling client-side routing.
+-   `index.html`: The main HTML template for the single-page application.
+-   `package.json`: Lists all frontend dependencies and scripts (like `dev`, `build`).
+-   `vite.config.js`: Configuration file for the Vite development server and build process.
+-   `tailwind.config.js` / `postcss.config.js`: Configuration files for Tailwind CSS.
+-   **`src/`**: Contains the main React application source code.
+    -   `main.jsx`: The entry point of the React app, where the `App` component is rendered to the DOM.
+    -   `index.css`: Global stylesheet where Tailwind CSS is imported.
+    -   `App.jsx`: The root component that sets up the application's router (`react-router-dom`).
+    -   `api.js`: A pre-configured Axios instance for making API calls. It automatically attaches the JWT token to every request.
+    -   **`components/`**: Contains all the React components that make up the UI. Each file typically represents a page or a major UI element (e.g., `Login.jsx`, `Dashboard.jsx`, `Layout.jsx`).
+    -   **`contexts/`**:
+        -   `AuthContext.jsx`: A React Context that manages global user authentication state, making it accessible throughout the application.
 
-## 📁 Project Structure
+---
 
-```
-EMS/
-├── .gitignore                  # Git ignore file
-├── package.json                # Root package.json (for monorepo management)
-├── package-lock.json           # Root lock file
-└── README.md                   # Project documentation
-
-#=======================[ Backend ]=======================#
-├── backend/
-│   ├── .env                    # Environment variables
-│   ├── index.js                # Server entry point
-│   ├── package.json            # Backend dependencies
-│   ├── package-lock.json       # Backend lock file
-│   │
-│   ├── config/
-│   │   └── db.js               # MongoDB connection
-│   │
-│   ├── controllers/
-│   │   ├── authController.js           # Authentication logic
-│   │   ├── departmentController.js     # Department management
-│   │   ├── employeeController.js       # Employee CRUD operations
-│   │   ├── jobApplicationController.js # Job application logic
-│   │   ├── jobPostingController.js     # Job posting logic
-│   │   ├── leaveController.js          # Leave management
-│   │   ├── performanceController.js    # Performance tracking
-│   │   ├── roleController.js           # Role management
-│   │   └── salaryController.js         # Payroll processing
-│   │
-│   ├── middleware/
-│   │   └── auth.js             # JWT verification & role authorization
-│   │
-│   ├── models/
-│   │   ├── Department.js       # Department management model
-│   │   ├── Employee.js         # Employee information model
-│   │   ├── JobApplication.js   # Job applications model
-│   │   ├── JobPosting.js       # Job postings model
-│   │   ├── Leave.js            # Leave management model
-│   │   ├── Performance.js      # Performance tracking model
-│   │   ├── Role.js             # Job roles model
-│   │   ├── Salary.js           # Payroll model
-│   │   └── User.js             # User authentication model
-│   │
-│   └── routes/
-│       ├── authRoutes.js           # Authentication routes
-│       ├── departmentRoutes.js     # Department routes
-│       ├── employeeRoutes.js       # Employee routes
-│       ├── jobApplicationRoutes.js # Job application routes
-│       ├── jobPostingRoutes.js     # Job posting routes
-│       ├── leaveRoutes.js          # Leave routes
-│       ├── performanceRoutes.js    # Performance routes
-│       ├── roleRoutes.js           # Role routes
-│       └── salaryRoutes.js         # Payroll routes
-│
-#=======================[ Frontend ]=======================#
-└── frontend/
-    ├── package.json            # Frontend dependencies
-    ├── package-lock.json       # Frontend lock file
-    ├── vite.config.js          # Vite configuration
-    ├── index.html              # Main HTML entry
-    │
-    ├── public/
-    │   └── _redirects          # Redirects for deployment (e.g., Netlify)
-    │
-    └── src/
-        ├── App.jsx             # Main app component
-        ├── main.jsx            # App entry point
-        ├── index.css           # Global styles
-        ├── api.js              # Central API call management
-        │
-        ├── components/         # Reusable UI components
-        │   ├── Dashboard.jsx   # Role-based dashboard
-        │   ├── Departments.jsx # Department management UI
-        │   ├── Employees.jsx   # Employee management UI
-        │   ├── Jobs.jsx        # Job postings & applications UI
-        │   ├── Layout.jsx      # Main layout wrapper
-        │   ├── Leave.jsx       # Leave management UI
-        │   ├── Login.jsx       # Login component
-        │   ├── Payroll.jsx     # Payroll management UI
-        │   ├── Performance.jsx # Performance tracking UI
-        │   └── Register.jsx    # Registration component
-        │
-        └── contexts/
-            └── AuthContext.jsx # Authentication context
-```            
-
-## 🚀 Getting Started
+## 🚀 Getting Started Locally
 
 ### Prerequisites
+-   Node.js (v16 or higher recommended)
+-   npm (or yarn)
+-   MongoDB (either installed locally or through a service like MongoDB Atlas)
 
-- Node.js (v16 or higher)
-- MongoDB (local installation or MongoDB Atlas)
-- npm or yarn package manager
+### Installation & Setup
 
-### Installation
+1.  **Clone the Repository**
+    ```bash
+    git clone <your-repository-url>
+    cd tech-solutions-ems
+    ```
 
-1. **Clone the repository**
+2.  **Setup the Backend**
+    ```bash
+    cd backend
+    npm install
+    cp .env.example .env
+    ```
+    -   Open the newly created `backend/.env` file and add your MongoDB connection string and a JWT secret:
+        ```env
+        MONGODB_URI=your_mongodb_connection_string
+        JWT_SECRET=your_super_secret_key
+        PORT=5000
+        ```
 
-   ```bash
-   git clone https://github.com/your-username/tech-solutions-ems.git
-   cd tech-solutions-ems
-   ```
+3.  **Seed the Database**
+    -   Make sure your MongoDB server is running.
+    -   Use a tool like MongoDB Compass or the `mongosh` command-line tool to run the contents of the `db.js` (seeding script) provided in the project files. This will populate your database with initial demo data.
 
-2. **Install frontend dependencies**
+4.  **Setup the Frontend**
+    ```bash
+    cd ../frontend
+    npm install
+    cp .env.local.example .env.local
+    ```
+    -   The `frontend/.env.local` file should point to your local backend server. The default is usually correct:
+        ```env
+        VITE_API_URL=http://localhost:5000/api
+        ```
 
-   ```bash
-   npm install
-   ```
+### Running the Application
 
-3. **Install backend dependencies**
+You'll need two separate terminal windows to run both the backend and frontend servers simultaneously.
 
-   ```bash
-   cd backend
-   npm install
-   ```
+1.  **Run the Backend Server** (from the `backend` directory)
+    ```bash
+    npm run dev
+    ```
+    -   The server should now be running on `http://localhost:5000`.
 
-4. **Set up environment variables**
+2.  **Run the Frontend Development Server** (from the `frontend` directory)
+    ```bash
+    npm run dev
+    ```
+    -   The application should now be accessible at `http://localhost:5173`.
 
-   ```bash
-   # Create .env file in backend directory
-   cp .env.example .env
-   ```
+---
 
-   Edit the `.env` file with your configuration:
+## 🚢 Deployment
 
-   ```env
-   MONGODB_URI=mongodb://localhost:27017/ems_db
-   JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_complex
-   PORT
-   ```
+-   The **frontend** is deployed on **Netlify**. The `_redirects` file in `frontend/public` is configured to handle client-side routing correctly.
+-   The **backend** can be deployed on any service that supports Node.js, such as Render, Heroku, or a VPS. Remember to set the environment variables (`MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`) in your deployment service's configuration.
