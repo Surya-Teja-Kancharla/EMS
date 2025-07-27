@@ -2,6 +2,8 @@
 
 A comprehensive, full-stack Employee Management System built with the MERN stack (MongoDB, Express.js, React, Node.js) for "Tech Solutions," a growing startup.
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/a1b2c3d4-e5f6-7890-abcd-ef1234567890/deploy-status)](https://app.netlify.com/sites/techsolutionsemsapp/deploys)
+
 ---
 
 ## 🌐 Live Demo & Credentials
@@ -170,5 +172,8 @@ You'll need two separate terminal windows to run both the backend and frontend s
 
 ## 🚢 Deployment
 
--   The **frontend** is deployed on **Netlify**. The `_redirects` file in `frontend/public` is configured to handle client-side routing correctly.
--   The **backend** can be deployed on any service that supports Node.js, such as Render, Heroku, or a VPS. Remember to set the environment variables (`MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`) in your deployment service's configuration.
+This project is deployed across three services:
+
+-   **Frontend**: Deployed on **Netlify**. The `_redirects` file in `frontend/public` is configured to handle client-side routing correctly for a seamless single-page application experience.
+-   **Backend**: Deployed on **Render**. As a Node.js/Express application, it can be hosted on any service that supports Node.js.
+-   **Database**: Hosted on **MongoDB Atlas**, a fully-managed cloud database service that ensures data is always available and secure.
