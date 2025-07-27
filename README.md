@@ -132,17 +132,22 @@ The project is organized into two main folders: `frontend` and `backend`.
     ```
     -   Open the newly created `backend/.env` file and add your configuration. It must follow this format:
         ```env
-        # The port your backend server will run on (e.g., 5000)
+        # Server Configuration
         PORT=5000
+        NODE_ENV=development
 
-        # Your MongoDB connection string (local or from Atlas)
-        MONGODB_URI=mongodb://localhost:27017/EMS
+        # MongoDB Connection String
+        # Use this line for local development
+        # MONGODB_URI=mongodb://localhost:27017/EMS
 
-        # A long, random, and secret string for signing JWT tokens
-        JWT_SECRET=your_super_secret_jwt_key_here
+        # Use this line for production (deployment on a service like Render)
+        MONGODB_URI=mongodb+srv://<username>:<password>@<your-cluster-url>/?retryWrites=true&w=majority
 
-        # The URL of your frontend application (for CORS in production)
-        # FRONTEND_URL=[https://techsolutionsemsapp.netlify.app](https://techsolutionsemsapp.netlify.app)
+        # JSON Web Token Secret
+        JWT_SECRET=A9F8E7B2C1D0F6A3B5D8E9C4F1A2B3E0C7D6F5A4B1E2C3D8F9A0B7C6E5D4F3A2
+
+        # Frontend URL (only needed for deployment)
+        FRONTEND_URL=[https://techsolutionsemsapp.netlify.app](https://techsolutionsemsapp.netlify.app)
         ```
 
 3.  **Seed the Database**
