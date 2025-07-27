@@ -2,8 +2,6 @@
 
 A comprehensive, full-stack Employee Management System built with the MERN stack (MongoDB, Express.js, React, Node.js) for "Tech Solutions," a growing startup.
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/a1b2c3d4-e5f6-7890-abcd-ef1234567890/deploy-status)](https://app.netlify.com/sites/techsolutionsemsapp/deploys)
-
 ---
 
 ## 🌐 Live Demo & Credentials
