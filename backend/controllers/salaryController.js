@@ -10,6 +10,7 @@ export const getAllSalaries = async (req, res) => {
       filter = { month: parseInt(month), year: parseInt(year) };
     }
 
+    // CORRECTED: Ensured consistent population of employee details.
     const salaries = await Salary.find(filter)
       .populate('employee', 'firstName lastName employeeId')
       .sort({ year: -1, month: -1, createdAt: -1 });
@@ -71,7 +72,9 @@ export const getEmployeeSalaries = async (req, res) => {
   try {
     const employeeId = req.params.employeeId || req.user.employee._id;
     
+    // CORRECTED: Added populate() to ensure employee details are included for single-employee view.
     const salaries = await Salary.find({ employee: employeeId })
+      .populate('employee', 'firstName lastName employeeId')
       .sort({ year: -1, month: -1 });
 
     res.json(salaries);

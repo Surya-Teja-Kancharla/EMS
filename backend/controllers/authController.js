@@ -8,7 +8,7 @@ const generateToken = (userId) => {
 };
 
 export const register = async (req, res) => {
-  // This function will now save the password in plain text due to User model changes.
+  // This function saves passwords in plain text and is NOT secure.
   try {
     const { email, password, role, firstName, lastName, phone, department, roleId } = req.body;
 
@@ -32,7 +32,7 @@ export const register = async (req, res) => {
 
     const user = new User({
       email,
-      password, // Password is saved as-is, without hashing.
+      password,
       role,
       employee: employee._id
     });
@@ -71,7 +71,12 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // UPDATED: Check password using the new insecure method
+    // CORRECTED: Add a check to ensure the employee profile exists.
+    // This prevents login failures if an employee record was deleted but the user was not.
+    if (!user.employee) {
+        return res.status(400).json({ message: 'Login failed: User profile is not associated with an active employee.' });
+    }
+
     const isMatch = user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -99,7 +104,7 @@ export const login = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate({ // Use req.user._id from authenticateToken middleware
+    const user = await User.findById(req.user._id).populate({
       path: 'employee',
       populate: [
         { path: 'department', select: 'name' },
@@ -107,8 +112,8 @@ export const getProfile = async (req, res) => {
       ]
     });
 
-    if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+    if (!user || !user.employee) { // Also check for employee existence here
+        return res.status(404).json({ message: 'User profile not found' });
     }
 
     res.json({

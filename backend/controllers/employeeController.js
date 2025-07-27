@@ -1,6 +1,7 @@
 import Employee from '../models/Employee.js';
 import User from '../models/User.js';
 
+// Get all employees
 export const getAllEmployees = async (req, res) => {
   try {
     const employees = await Employee.find()
@@ -15,6 +16,7 @@ export const getAllEmployees = async (req, res) => {
   }
 };
 
+// Get a single employee by their ID
 export const getEmployeeById = async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id)
@@ -32,6 +34,7 @@ export const getEmployeeById = async (req, res) => {
   }
 };
 
+// Create a new employee record
 export const createEmployee = async (req, res) => {
   try {
     const employeeId = `EMP${Date.now()}`;
@@ -50,6 +53,7 @@ export const createEmployee = async (req, res) => {
   }
 };
 
+// Update an existing employee's details
 export const updateEmployee = async (req, res) => {
   try {
     const employee = await Employee.findByIdAndUpdate(
@@ -71,6 +75,7 @@ export const updateEmployee = async (req, res) => {
   }
 };
 
+// Delete an employee record
 export const deleteEmployee = async (req, res) => {
   try {
     const employee = await Employee.findByIdAndDelete(req.params.id);
@@ -79,7 +84,7 @@ export const deleteEmployee = async (req, res) => {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    // Also delete associated user account
+    // Also delete the associated user account to prevent orphaned users
     await User.findOneAndDelete({ employee: employee._id });
 
     res.json({ message: 'Employee deleted successfully' });
@@ -88,6 +93,7 @@ export const deleteEmployee = async (req, res) => {
   }
 };
 
+// Get aggregated employee statistics
 export const getEmployeeStats = async (req, res) => {
   try {
     const totalEmployees = await Employee.countDocuments();
@@ -127,4 +133,17 @@ export const getEmployeeStats = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
+};
+
+// NEW: Get all employees belonging to a specific department
+export const getEmployeesByDepartment = async (req, res) => {
+    try {
+        const { departmentId } = req.params;
+        const employees = await Employee.find({ department: departmentId })
+            .select('firstName lastName')
+            .sort({ firstName: 1 });
+        res.json(employees);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 };

@@ -1,4 +1,4 @@
-// File: src/components/Dashboard/Dashboard.jsx
+// File: src/components/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -10,9 +10,7 @@ import {
   Clock,
   Award,
   DollarSign,
-  FileText,
   Briefcase,
-  Settings,
   UserCheck
 } from 'lucide-react';
 import api from '../api';
@@ -57,8 +55,8 @@ const Dashboard = () => {
         return { title: 'System Overview', description: 'Complete control over the Employee Management System' };
       case 'hr':
         return { title: 'HR Dashboard', description: 'Manage employees, payroll, and organizational data' };
-      case 'department_head':
-        return { title: 'Department Management', description: 'Oversee your team performance and assignments' };
+      case 'manager':
+        return { title: 'Manager Dashboard', description: 'Oversee your team performance and assignments' };
       default:
         return { title: 'Employee Portal', description: 'Access your personal information and company resources' };
     }
@@ -78,7 +76,7 @@ const Dashboard = () => {
             <button onClick={() => navigate('/payroll')} className="flex flex-col items-center justify-center p-4 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"><DollarSign className="h-8 w-8 text-orange-600 mb-2" /><span className="text-sm font-medium text-gray-900">Process Payroll</span></button>
           </>
         );
-      case 'department_head':
+      case 'manager':
        return (
         <>
           <button onClick={() => navigate('/leave')} className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"><UserCheck className="h-8 w-8 text-blue-600 mb-2" /><span className="text-sm font-medium text-gray-900">Approve Leaves</span></button>
@@ -99,7 +97,7 @@ const Dashboard = () => {
     }
   };
 
-  if (loading && !stats) {
+  if (loading && (user?.role === 'admin' || user?.role === 'hr') && !stats) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -109,7 +107,6 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
@@ -127,7 +124,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
       {(user?.role === 'admin' || user?.role === 'hr') && stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-xl p-6 shadow-sm border"><div className="flex items-center"><div className="p-2 bg-blue-100 rounded-lg"><Users className="h-6 w-6 text-blue-600" /></div><div className="ml-4"><p className="text-sm font-medium text-gray-600">Total Employees</p><p className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</p></div></div></div>
@@ -137,7 +133,6 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -145,11 +140,9 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* My Information Section */}
       {user?.employee && (
         <div className="bg-white rounded-xl p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">My Information</h3>
-          {/* FIX: Changed grid to auto-size the first column for a tighter layout */}
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 items-center">
             <div className="text-sm font-medium text-gray-600">Employee ID:</div>
             <div className="text-sm text-gray-900">{user.employee?.employeeId || 'N/A'}</div>
@@ -162,7 +155,7 @@ const Dashboard = () => {
 
             <div className="text-sm font-medium text-gray-600">Status:</div>
             <div>
-                <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                <span className="inline-flex capitalize px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
                     {user.employee?.status || 'N/A'}
                 </span>
             </div>

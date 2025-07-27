@@ -6,49 +6,58 @@ import {
   BarChart3,
   Calendar,
   Briefcase,
-  Settings,
+  DollarSign,
   LogOut,
   Menu,
   X,
   Home
 } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Navigation items with role-based access control
   const navigationItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home, roles: ['admin', 'hr', 'department_head', 'employee'] },
-    { name: 'Employees', href: '/employees', icon: Users, roles: ['admin', 'hr', 'department_head'] },
+    { name: 'Dashboard', href: '/dashboard', icon: Home, roles: ['admin', 'hr', 'manager', 'employee'] },
+    { name: 'Employees', href: '/employees', icon: Users, roles: ['admin', 'hr', 'manager'] },
     { name: 'Departments', href: '/departments', icon: Building2, roles: ['admin', 'hr'] },
-    { name: 'Performance', href: '/performance', icon: BarChart3, roles: ['admin', 'hr', 'department_head', 'employee'] },
-    { name: 'Leave', href: '/leave', icon: Calendar, roles: ['admin', 'hr', 'department_head', 'employee'] },
-    { name: 'Jobs', href: '/jobs', icon: Briefcase, roles: ['admin', 'hr', 'employee'] },
-    { name: 'Payroll', href: '/payroll', icon: Settings, roles: ['admin', 'hr', 'employee'] },
+    { name: 'Performance', href: '/performance', icon: BarChart3, roles: ['admin', 'hr', 'manager', 'employee'] },
+    { name: 'Leave', href: '/leave', icon: Calendar, roles: ['admin', 'hr', 'manager', 'employee'] },
+    { name: 'Jobs', href: '/jobs', icon: Briefcase, roles: ['admin', 'hr', 'manager', 'employee'] },
+    { name: 'Payroll', href: '/payroll', icon: DollarSign, roles: ['admin', 'hr', 'employee'] },
   ];
 
+  // Role name display mapping
+  const roleDisplayNames = {
+    admin: 'System Admin',
+    hr: 'HR',
+    manager: 'Manager',
+    employee: 'Employee',
+  };
+
+  // Filter navigation based on the current user's role
   const filteredNavigation = navigationItems.filter(item =>
     item.roles.includes(user?.role || 'employee')
   );
 
   const handleLogout = async () => {
     try {
-        await logout();
-        navigate('/login'); // Redirect to login page after logout
+      await logout();
+      navigate('/login');
     } catch (error) {
-        console.error("Failed to log out:", error);
+      console.error("Failed to log out:", error);
     }
   };
 
   return (
-    // The main container uses flexbox to lay out the sidebar and content.
     <div className="flex min-h-screen bg-gray-50">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -59,7 +68,6 @@ const Layout = ({ children }) => {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
         lg:translate-x-0 lg:static`}>
         
-        {/* Sidebar Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <Building2 className="h-8 w-8 text-blue-600" />
@@ -73,7 +81,6 @@ const Layout = ({ children }) => {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="mt-6 px-4 flex-1">
           <ul className="space-y-2">
             {filteredNavigation.map(item => {
@@ -98,7 +105,6 @@ const Layout = ({ children }) => {
           </ul>
         </nav>
 
-        {/* User Profile & Logout */}
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center space-x-3 mb-4">
             <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center">
@@ -111,7 +117,10 @@ const Layout = ({ children }) => {
               <p className="text-sm font-medium text-gray-900 truncate">
                 {user?.employee?.firstName} {user?.employee?.lastName}
               </p>
-              <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+              {/* Replaced capitalize with mapped display name */}
+              <p className="text-xs text-gray-500">
+                {roleDisplayNames[user?.role] || user?.role}
+              </p>
             </div>
           </div>
           <button
@@ -124,9 +133,7 @@ const Layout = ({ children }) => {
         </div>
       </div>
 
-      {/* Main content area */}
       <div className="flex-1 flex flex-col">
-        {/* Top header */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between h-16 px-6">
             <button
@@ -142,7 +149,6 @@ const Layout = ({ children }) => {
           </div>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 p-6 overflow-y-auto">
           {children}
         </main>

@@ -35,6 +35,8 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// This method is insecure and should NOT be used in production.
+// It directly compares the candidate password with the stored plain text password.
 userSchema.methods.comparePassword = function(candidatePassword) {
   return this.password === candidatePassword;
 };

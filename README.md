@@ -91,60 +91,88 @@ Tech Solutions is a software development company that creates custom solutions a
 
 ```
 EMS/
+├── .gitignore                  # Git ignore file
+├── package.json                # Root package.json (for monorepo management)
+├── package-lock.json           # Root lock file
+└── README.md                   # Project documentation
+
+#=======================[ Backend ]=======================#
 ├── backend/
+│   ├── .env                    # Environment variables
+│   ├── index.js                # Server entry point
+│   ├── package.json            # Backend dependencies
+│   ├── package-lock.json       # Backend lock file
+│   │
 │   ├── config/
-│   │   └── db.js                    # MongoDB connection
-│   ├── models/
-│   │   ├── User.js                  # User authentication model
-│   │   ├── Employee.js              # Employee information model
-│   │   ├── Department.js            # Department management model
-│   │   ├── Role.js                  # Job roles model
-│   │   ├── Salary.js                # Payroll model
-│   │   ├── Performance.js           # Performance tracking model
-│   │   ├── Leave.js                 # Leave management model
-│   │   ├── JobPosting.js            # Job postings model
-│   │   └── JobApplication.js        # Job applications model
+│   │   └── db.js               # MongoDB connection
+│   │
 │   ├── controllers/
-│   │   ├── authController.js        # Authentication logic
-│   │   ├── employeeController.js    # Employee CRUD operations
-│   │   ├── departmentController.js  # Department management
-│   │   ├── roleController.js        # Role management
-│   │   ├── performanceController.js # Performance tracking
-│   │   ├── leaveController.js       # Leave management
-│   │   └── salaryController.js      # Payroll processing
-│   ├── routes/
-│   │   ├── authRoutes.js            # Authentication routes
-│   │   ├── employeeRoutes.js        # Employee routes
-│   │   ├── departmentRoutes.js      # Department routes
-│   │   ├── roleRoutes.js            # Role routes
-│   │   ├── performanceRoutes.js     # Performance routes
-│   │   ├── leaveRoutes.js           # Leave routes
-│   │   └── salaryRoutes.js          # Payroll routes
+│   │   ├── authController.js           # Authentication logic
+│   │   ├── departmentController.js     # Department management
+│   │   ├── employeeController.js       # Employee CRUD operations
+│   │   ├── jobApplicationController.js # Job application logic
+│   │   ├── jobPostingController.js     # Job posting logic
+│   │   ├── leaveController.js          # Leave management
+│   │   ├── performanceController.js    # Performance tracking
+│   │   ├── roleController.js           # Role management
+│   │   └── salaryController.js         # Payroll processing
+│   │
 │   ├── middleware/
-│   │   └── auth.js                  # JWT verification & role authorization
-│   ├── .env                         # Environment variables
-│   ├── index.js                     # Server entry point
-│   └── package.json
-├── src/
-│   ├── components/
-│   │   │   ├── Login.tsx            # Login component
-│   │   │   └── Register.tsx         # Registration component
-│   │   │   └── Dashboard.tsx        # Role-based dashboard
-│   │   │   └── Employees.tsx        # Employee management
-│   │   │   └── Departments.tsx      # Department management
-│   │   │   └── Performance.tsx      # Performance tracking
-│   │   │   └── Leave.tsx            # Leave management
-│   │   │   └── Payroll.tsx          # Payroll management
-│   │   │   └── Layout.tsx           # Main layout wrapper
-│   ├── contexts/
-│   │   └── AuthContext.tsx          # Authentication context
-│   ├── App.tsx                      # Main app component
-│   └── main.tsx                     # App entry point
-│   ├── dist/
-│       └── index.html                   
-├── package.json
-└── README.md
-```
+│   │   └── auth.js             # JWT verification & role authorization
+│   │
+│   ├── models/
+│   │   ├── Department.js       # Department management model
+│   │   ├── Employee.js         # Employee information model
+│   │   ├── JobApplication.js   # Job applications model
+│   │   ├── JobPosting.js       # Job postings model
+│   │   ├── Leave.js            # Leave management model
+│   │   ├── Performance.js      # Performance tracking model
+│   │   ├── Role.js             # Job roles model
+│   │   ├── Salary.js           # Payroll model
+│   │   └── User.js             # User authentication model
+│   │
+│   └── routes/
+│       ├── authRoutes.js           # Authentication routes
+│       ├── departmentRoutes.js     # Department routes
+│       ├── employeeRoutes.js       # Employee routes
+│       ├── jobApplicationRoutes.js # Job application routes
+│       ├── jobPostingRoutes.js     # Job posting routes
+│       ├── leaveRoutes.js          # Leave routes
+│       ├── performanceRoutes.js    # Performance routes
+│       ├── roleRoutes.js           # Role routes
+│       └── salaryRoutes.js         # Payroll routes
+│
+#=======================[ Frontend ]=======================#
+└── frontend/
+    ├── package.json            # Frontend dependencies
+    ├── package-lock.json       # Frontend lock file
+    ├── vite.config.js          # Vite configuration
+    ├── index.html              # Main HTML entry
+    │
+    ├── public/
+    │   └── _redirects          # Redirects for deployment (e.g., Netlify)
+    │
+    └── src/
+        ├── App.jsx             # Main app component
+        ├── main.jsx            # App entry point
+        ├── index.css           # Global styles
+        ├── api.js              # Central API call management
+        │
+        ├── components/         # Reusable UI components
+        │   ├── Dashboard.jsx   # Role-based dashboard
+        │   ├── Departments.jsx # Department management UI
+        │   ├── Employees.jsx   # Employee management UI
+        │   ├── Jobs.jsx        # Job postings & applications UI
+        │   ├── Layout.jsx      # Main layout wrapper
+        │   ├── Leave.jsx       # Leave management UI
+        │   ├── Login.jsx       # Login component
+        │   ├── Payroll.jsx     # Payroll management UI
+        │   ├── Performance.jsx # Performance tracking UI
+        │   └── Register.jsx    # Registration component
+        │
+        └── contexts/
+            └── AuthContext.jsx # Authentication context
+```            
 
 ## 🚀 Getting Started
 

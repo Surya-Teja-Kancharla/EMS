@@ -1,6 +1,8 @@
 import Performance from '../models/Performance.js';
 import Employee from '../models/Employee.js';
 
+// ... (getAllPerformances, getPerformanceById, createPerformance, updatePerformance, getEmployeePerformances, getEmployeesForReview remain the same)
+
 export const getAllPerformances = async (req, res) => {
   try {
     const performances = await Performance.find()
@@ -77,6 +79,36 @@ export const getEmployeePerformances = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.json(performances);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const getEmployeesForReview = async (req, res) => {
+    try {
+        if (req.user.role !== 'manager') {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        const managerDepartment = req.user.employee.department;
+        const employees = await Employee.find({
+            department: managerDepartment,
+            _id: { $ne: req.user.employee._id }
+        }).select('firstName lastName');
+
+        res.json(employees);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// NEW: Delete a performance review
+export const deletePerformance = async (req, res) => {
+  try {
+    const performance = await Performance.findByIdAndDelete(req.params.id);
+    if (!performance) {
+      return res.status(404).json({ message: 'Performance record not found' });
+    }
+    res.json({ message: 'Performance record deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
