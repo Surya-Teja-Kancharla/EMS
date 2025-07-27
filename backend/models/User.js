@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'hr', 'department_head', 'employee'],
+    enum: ['admin', 'hr', 'manager', 'employee'],
     default: 'employee'
   },
   employee: {
@@ -35,9 +35,6 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// REMOVED: The pre-save hook that hashes the password is gone.
-
-// UPDATED: This method now does a simple, insecure string comparison.
 userSchema.methods.comparePassword = function(candidatePassword) {
   return this.password === candidatePassword;
 };
