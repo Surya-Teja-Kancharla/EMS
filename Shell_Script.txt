@@ -1,0 +1,189 @@
+/*
+ * =================================================================================
+ * MongoDB Seeding Script for EMS - V5 (Manager Role Update)
+ * =================================================================================
+ *
+ * This script includes:
+ * - Consistent use of 'manager' role.
+ * - Expanded data for leaves, performances, and salaries for all employees.
+ * - Plain text passwords for local development.
+ *
+ */
+
+// --- Switch to the EMS database ---
+use('EMS');
+
+// --- Drop existing collections ---
+db.users.drop();
+db.employees.drop();
+db.departments.drop();
+db.roles.drop();
+db.leaves.drop();
+db.performances.drop();
+db.salaries.drop();
+db.jobpostings.drop();
+db.jobapplications.drop();
+print("--- Dropped existing collections ---");
+
+// --- Generate ObjectIds ---
+const devDeptId = new ObjectId();
+const pmDeptId = new ObjectId();
+const salesDeptId = new ObjectId();
+const mktgDeptId = new ObjectId();
+const hrDeptId = new ObjectId();
+
+const adminRoleId = new ObjectId();
+const managerRoleId = new ObjectId();
+const hrRoleId = new ObjectId();
+const developerRoleId = new ObjectId();
+const productManagerRoleId = new ObjectId();
+const salesExecRoleId = new ObjectId();
+const marketingSpecRoleId = new ObjectId();
+
+const adminId = new ObjectId();
+const hrManagerId = new ObjectId();
+const devManagerId = new ObjectId();
+const pmManagerId = new ObjectId();
+const salesManagerId = new ObjectId();
+const mktgManagerId = new ObjectId();
+const empDev1Id = new ObjectId();
+const empDev2Id = new ObjectId();
+const empPm1Id = new ObjectId();
+const empPm2Id = new ObjectId();
+const empSales1Id = new ObjectId();
+const empSales2Id = new ObjectId();
+const empMktg1Id = new ObjectId();
+const empMktg2Id = new ObjectId();
+
+// --- 1. Departments Collection ---
+db.departments.insertMany([
+  { _id: devDeptId, name: 'Development', description: 'To build and maintain the company\'s software products.', head: devManagerId, budget: 750000, isActive: true },
+  { _id: pmDeptId, name: 'Product Management', description: 'To guide the success of a product and lead the cross-functional team.', head: pmManagerId, budget: 400000, isActive: true },
+  { _id: salesDeptId, name: 'Sales & Business Development', description: 'To drive revenue growth and build strategic partnerships.', head: salesManagerId, budget: 600000, isActive: true },
+  { _id: mktgDeptId, name: 'Marketing & Growth', description: 'To manage branding, lead generation, and user acquisition.', head: mktgManagerId, budget: 550000, isActive: true },
+  { _id: hrDeptId, name: 'Human Resources', description: 'To manage employee relations, recruitment, and benefits.', head: hrManagerId, budget: 250000, isActive: true }
+]);
+print("--- Seeded 5 Departments ---");
+
+// --- 2. Roles Collection ---
+db.roles.insertMany([
+  { _id: adminRoleId, title: 'System Administrator', department: hrDeptId, baseSalary: 120000, level: 'admin' },
+  { _id: hrRoleId, title: 'HR Manager', department: hrDeptId, baseSalary: 95000, level: 'manager' },
+  { _id: managerRoleId, title: 'Manager', department: devDeptId, baseSalary: 110000, level: 'manager' },
+  { _id: developerRoleId, title: 'Software Developer', department: devDeptId, baseSalary: 80000, level: 'senior' },
+  { _id: productManagerRoleId, title: 'Product Manager', department: pmDeptId, baseSalary: 95000, level: 'senior' },
+  { _id: salesExecRoleId, title: 'Sales Executive', department: salesDeptId, baseSalary: 85000, level: 'mid' },
+  { _id: marketingSpecRoleId, title: 'Marketing Specialist', department: mktgDeptId, baseSalary: 65000, level: 'mid' }
+]);
+print("--- Seeded 7 Roles ---");
+
+// --- 3. Employees Collection ---
+const employees = [
+  { _id: adminId, employeeId: 'TS-ADMIN', firstName: 'Admin', lastName: 'User', email: 'admin@techsolutions.com', phone: '9876543210', department: hrDeptId, role: adminRoleId, dateOfJoining: new Date('2020-01-15'), status: 'active' },
+  { _id: hrManagerId, employeeId: 'TS-HR001', firstName: 'Priya', lastName: 'Patel', email: 'hr@techsolutions.com', phone: '9876543211', department: hrDeptId, role: hrRoleId, dateOfJoining: new Date('2021-03-20'), status: 'active' },
+  { _id: devManagerId, employeeId: 'TS-MGR-DEV', firstName: 'Raj', lastName: 'Verma', email: 'raj.verma@techsolutions.com', phone: '9111111111', department: devDeptId, role: managerRoleId, dateOfJoining: new Date('2022-01-10'), status: 'active' },
+  { _id: pmManagerId, employeeId: 'TS-MGR-PM', firstName: 'Sunita', lastName: 'Sharma', email: 'sunita.sharma@techsolutions.com', phone: '9222222222', department: pmDeptId, role: managerRoleId, dateOfJoining: new Date('2021-08-15'), status: 'active' },
+  { _id: salesManagerId, employeeId: 'TS-MGR-SAL', firstName: 'Amit', lastName: 'Singh', email: 'amit.singh@techsolutions.com', phone: '9333333333', department: salesDeptId, role: managerRoleId, dateOfJoining: new Date('2020-11-05'), status: 'active' },
+  { _id: mktgManagerId, employeeId: 'TS-MGR-MKT', firstName: 'Deepa', lastName: 'Mehta', email: 'deepa.mehta@techsolutions.com', phone: '9444444444', department: mktgDeptId, role: managerRoleId, dateOfJoining: new Date('2022-04-20'), status: 'active' },
+  { _id: empDev1Id, employeeId: 'TS-DEV001', firstName: 'Kiran', lastName: 'Rao', email: 'kiran.rao@techsolutions.com', phone: '9555555555', department: devDeptId, role: developerRoleId, manager: devManagerId, dateOfJoining: new Date('2023-02-11'), status: 'active' },
+  { _id: empDev2Id, employeeId: 'TS-DEV002', firstName: 'Neha', lastName: 'Joshi', email: 'neha.joshi@techsolutions.com', phone: '9666666666', department: devDeptId, role: developerRoleId, manager: devManagerId, dateOfJoining: new Date('2024-01-30'), status: 'inactive' },
+  { _id: empPm1Id, employeeId: 'TS-PM001', firstName: 'Arjun', lastName: 'Nair', email: 'arjun.nair@techsolutions.com', phone: '9777777777', department: pmDeptId, role: productManagerRoleId, manager: pmManagerId, dateOfJoining: new Date('2023-05-18'), status: 'active' },
+  { _id: empPm2Id, employeeId: 'TS-PM002', firstName: 'Isha', lastName: 'Malik', email: 'isha.malik@techsolutions.com', phone: '9888888888', department: pmDeptId, role: productManagerRoleId, manager: pmManagerId, dateOfJoining: new Date('2023-10-02'), status: 'active' },
+  { _id: empSales1Id, employeeId: 'TS-SAL001', firstName: 'Vijay', lastName: 'Kumar', email: 'vijay.kumar@techsolutions.com', phone: '9999999999', department: salesDeptId, role: salesExecRoleId, manager: salesManagerId, dateOfJoining: new Date('2022-09-01'), status: 'active' },
+  { _id: empSales2Id, employeeId: 'TS-SAL002', firstName: 'Pooja', lastName: 'Chopra', email: 'pooja.chopra@techsolutions.com', phone: '9000000000', department: salesDeptId, role: salesExecRoleId, manager: salesManagerId, dateOfJoining: new Date('2024-03-12'), status: 'active' },
+  { _id: empMktg1Id, employeeId: 'TS-MKT001', firstName: 'Rahul', lastName: 'Gupta', email: 'rahul.gupta@techsolutions.com', phone: '9101010101', department: mktgDeptId, role: marketingSpecRoleId, manager: mktgManagerId, dateOfJoining: new Date('2023-07-22'), status: 'active' },
+  { _id: empMktg2Id, employeeId: 'TS-MKT002', firstName: 'Ananya', lastName: 'Das', email: 'ananya.das@techsolutions.com', phone: '9202020202', department: mktgDeptId, role: marketingSpecRoleId, manager: mktgManagerId, dateOfJoining: new Date('2024-05-01'), status: 'inactive' }
+];
+db.employees.insertMany(employees);
+print(`--- Seeded ${employees.length} Employees ---`);
+
+// --- 4. Users Collection ---
+db.users.insertMany([
+  { email: 'admin@techsolutions.com', password: 'admin123', role: 'admin', employee: adminId },
+  { email: 'hr@techsolutions.com', password: 'hr123', role: 'hr', employee: hrManagerId },
+  { email: 'raj.verma@techsolutions.com', password: 'manager123', role: 'manager', employee: devManagerId },
+  { email: 'sunita.sharma@techsolutions.com', password: 'manager123', role: 'manager', employee: pmManagerId },
+  { email: 'amit.singh@techsolutions.com', password: 'manager123', role: 'manager', employee: salesManagerId },
+  { email: 'deepa.mehta@techsolutions.com', password: 'manager123', role: 'manager', employee: mktgManagerId },
+  { email: 'kiran.rao@techsolutions.com', password: 'emp123', role: 'employee', employee: empDev1Id },
+  { email: 'neha.joshi@techsolutions.com', password: 'emp123', role: 'employee', employee: empDev2Id },
+  { email: 'arjun.nair@techsolutions.com', password: 'emp123', role: 'employee', employee: empPm1Id },
+  { email: 'isha.malik@techsolutions.com', password: 'emp123', role: 'employee', employee: empPm2Id },
+  { email: 'vijay.kumar@techsolutions.com', password: 'emp123', role: 'employee', employee: empSales1Id },
+  { email: 'pooja.chopra@techsolutions.com', password: 'emp123', role: 'employee', employee: empSales2Id },
+  { email: 'rahul.gupta@techsolutions.com', password: 'emp123', role: 'employee', employee: empMktg1Id },
+  { email: 'ananya.das@techsolutions.com', password: 'emp123', role: 'employee', employee: empMktg2Id }
+]);
+print(`--- Seeded ${employees.length} Users ---`);
+
+// --- 5. Leaves Collection (Expanded) ---
+const leaves = [
+    { employee: empDev1Id, type: 'annual', startDate: new Date('2025-08-10'), endDate: new Date('2025-08-15'), days: 6, reason: 'Family vacation', status: 'approved', approver: devManagerId },
+    { employee: empSales1Id, type: 'sick', startDate: new Date('2025-07-28'), endDate: new Date('2025-07-29'), days: 2, reason: 'Fever and cold', status: 'pending' },
+    { employee: empMktg2Id, type: 'personal', startDate: new Date('2025-09-01'), endDate: new Date('2025-09-01'), days: 1, reason: 'Personal appointment', status: 'rejected', approver: mktgManagerId, approvalComments: 'Please provide more details.' },
+    { employee: empPm1Id, type: 'annual', startDate: new Date('2025-10-05'), endDate: new Date('2025-10-10'), days: 6, reason: 'Trip to mountains', status: 'pending' },
+    { employee: empDev2Id, type: 'sick', startDate: new Date('2025-08-01'), endDate: new Date('2025-08-01'), days: 1, reason: 'Migraine', status: 'approved', approver: devManagerId },
+    { employee: devManagerId, type: 'annual', startDate: new Date('2025-11-10'), endDate: new Date('2025-11-12'), days: 3, reason: 'Conference', status: 'approved', approver: hrManagerId },
+    { employee: salesManagerId, type: 'personal', startDate: new Date('2025-09-05'), endDate: new Date('2025-09-05'), days: 1, reason: 'Bank work', status: 'approved', approver: hrManagerId },
+    { employee: empSales2Id, type: 'emergency', startDate: new Date('2025-08-20'), endDate: new Date('2025-08-21'), days: 2, reason: 'Family emergency', status: 'pending' },
+    { employee: hrManagerId, type: 'sick', startDate: new Date('2025-10-15'), endDate: new Date('2025-10-15'), days: 1, reason: 'Doctor appointment', status: 'approved', approver: adminId }
+];
+db.leaves.insertMany(leaves);
+print(`--- Seeded ${leaves.length} Leaves ---`);
+
+// --- 6. Performances & 7. Salaries Collection (Expanded for all employees) ---
+const performances = [];
+const salaries = [];
+const employeeUsers = employees.filter(e => e.employeeId !== 'TS-ADMIN'); 
+
+const reviewPeriods = [
+    { startDate: new Date('2025-01-01'), endDate: new Date('2025-06-30') },
+    { startDate: new Date('2024-07-01'), endDate: new Date('2024-12-31') }
+];
+
+employeeUsers.forEach(emp => {
+    const randomPeriod = reviewPeriods[Math.floor(Math.random() * reviewPeriods.length)];
+    const technical = Math.floor(Math.random() * 3) + 3;
+    const communication = Math.floor(Math.random() * 3) + 3;
+    const teamwork = Math.floor(Math.random() * 3) + 3;
+    const overallRating = ((technical + communication + teamwork) / 3).toFixed(1);
+
+    performances.push({
+        employee: emp._id,
+        reviewer: emp.manager || hrManagerId,
+        period: randomPeriod,
+        ratings: { technical, communication, teamwork },
+        overallRating: parseFloat(overallRating),
+        feedback: { strengths: 'Good performance, meets expectations.', improvements: 'Can be more proactive in team meetings.' },
+        status: 'approved'
+    });
+
+    const role = db.roles.findOne({ _id: emp.role });
+    if (role) {
+        const netSalary = role.baseSalary + (role.baseSalary * 0.2) - (role.baseSalary * 0.16);
+        salaries.push({
+            employee: emp._id,
+            basicSalary: role.baseSalary,
+            allowances: { hra: role.baseSalary * 0.2 },
+            deductions: { pf: role.baseSalary * 0.06, tax: role.baseSalary * 0.1 },
+            month: 7,
+            year: 2025,
+            attendedDays: 22,
+            netSalary: netSalary,
+            status: 'paid'
+        });
+    }
+});
+db.performances.insertMany(performances);
+print(`--- Seeded ${performances.length} Performances ---`);
+db.salaries.insertMany(salaries);
+print(`--- Seeded ${salaries.length} Salaries ---`);
+
+// --- 8. Job Postings Collection ---
+db.jobpostings.insertMany([
+  { title: 'Senior Product Manager', department: pmDeptId, description: 'Lead the next generation of our flagship product.', requirements: ['5+ years in PM', 'Agile methodologies'], postedBy: hrManagerId, deadline: new Date('2025-08-31'), status: 'active' },
+  { title: 'Digital Marketing Lead', department: mktgDeptId, description: 'Own our digital presence and lead generation strategy.', requirements: ['SEO/SEM', 'Content Marketing'], postedBy: hrManagerId, deadline: new Date('2025-09-15'), status: 'active' }
+]);
+print("--- Seeded 2 Job Postings ---");
+
+print("\n✅ Database 'EMS' and all collections have been created and seeded successfully!");
