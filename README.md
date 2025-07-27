@@ -147,7 +147,7 @@ The project is organized into two main folders: `frontend` and `backend`.
         JWT_SECRET=A9F8E7B2C1D0F6A3B5D8E9C4F1A2B3E0C7D6F5A4B1E2C3D8F9A0B7C6E5D4F3A2
 
         # Frontend URL (only needed for deployment)
-        FRONTEND_URL=[https://techsolutionsemsapp.netlify.app](https://techsolutionsemsapp.netlify.app)
+        **🔗 Live App URL: [https://your-project-name.netlify.app/login](https://your-project-name.netlify.app/login)**
         ```
 
 3.  **Seed the Database**
