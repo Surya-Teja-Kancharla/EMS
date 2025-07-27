@@ -36,7 +36,7 @@ const corsOptions = {
   origin: [
     'http://localhost:5173', // Vite's default dev port
     'http://localhost:3000', // Common React dev port
-    process.env.FRONTEND_URL    // Your production frontend URL from .env
+    'https://techsolutionsems.netlify.app'  // ✅ Add this explicitly
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
